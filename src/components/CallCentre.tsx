@@ -107,8 +107,9 @@ export const CallCentre: React.FC = () => {
           <div className="lg:col-span-5 space-y-6">
             <div className="relative rounded-3xl overflow-hidden border-2 border-lime-400/80 shadow-2xl group">
               <img
-                src="/src/assets/images/call_centre_rep_1786274881061.jpg"
+                src="/assets/images/call_centre_rep_1786274881061.jpg"
                 alt="RTIFN Call Centre Support"
+                referrerPolicy="no-referrer"
                 className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />

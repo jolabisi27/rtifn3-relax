@@ -173,8 +173,9 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick, onSlidesClick, regi
             {/* Campaign Visual Thumbnail */}
             <div className="relative rounded-2xl overflow-hidden border border-emerald-700/80 shadow-xl group">
               <img
-                src="/src/assets/images/rtifn_rally_1786274866514.jpg"
+                src="/assets/images/rtifn_rally_1786274866514.jpg"
                 alt="RTIFN Campaign Rally"
+                referrerPolicy="no-referrer"
                 className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';

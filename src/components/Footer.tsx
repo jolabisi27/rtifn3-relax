@@ -21,8 +21,9 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, isAdminAuthenticat
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
               <img
-                src="/src/assets/images/rtifn_logo_1786274851065.jpg"
+                src="/assets/images/rtifn_logo_1786274851065.jpg"
                 alt="RTIFN Emblem"
+                referrerPolicy="no-referrer"
                 className="w-12 h-12 rounded-full border-2 border-lime-400 object-cover"
                 onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />

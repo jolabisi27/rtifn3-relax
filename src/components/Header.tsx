@@ -112,8 +112,9 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavClick('home')}>
             <div className="relative w-12 h-12 rounded-full bg-emerald-900 border-2 border-lime-400/80 p-0.5 flex items-center justify-center overflow-hidden shadow-lg group">
               <img
-                src="/src/assets/images/rtifn_logo_1786274851065.jpg"
+                src="/assets/images/rtifn_logo_1786274851065.jpg"
                 alt="RTIFN Logo"
+                referrerPolicy="no-referrer"
                 className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform"
                 onError={(e) => {
                   // Fallback logo SVG if image fails

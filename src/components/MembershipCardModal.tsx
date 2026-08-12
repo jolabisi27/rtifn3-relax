@@ -78,8 +78,9 @@ export const MembershipCardModal: React.FC<MembershipCardModalProps> = ({
             <div className="flex items-center justify-between border-b border-lime-400/30 pb-3">
               <div className="flex items-center gap-2.5">
                 <img
-                  src="/src/assets/images/rtifn_logo_1786274851065.jpg"
+                  src="/assets/images/rtifn_logo_1786274851065.jpg"
                   alt="RTIFN Emblem"
+                  referrerPolicy="no-referrer"
                   className="w-10 h-10 rounded-full border border-lime-400 object-cover"
                   onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                 />

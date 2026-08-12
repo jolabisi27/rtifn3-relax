@@ -389,6 +389,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <img
                 src={adminProfile.avatarUrl}
                 alt={adminProfile.fullName}
+                referrerPolicy="no-referrer"
                 className="w-10 h-10 rounded-xl object-cover border border-lime-400 group-hover:scale-105 transition-transform"
               />
               <div className="text-right">

@@ -166,6 +166,7 @@ export const AdminProfileSettings: React.FC<AdminProfileSettingsProps> = ({
             <img
               src={currentProfile.avatarUrl}
               alt={currentProfile.fullName}
+              referrerPolicy="no-referrer"
               className="w-20 h-20 rounded-2xl object-cover border-2 border-lime-400 shadow-xl"
             />
             <button
@@ -361,6 +362,7 @@ export const AdminProfileSettings: React.FC<AdminProfileSettingsProps> = ({
               <img
                 src={selectedAvatar}
                 alt="Active Avatar"
+                referrerPolicy="no-referrer"
                 className="w-32 h-32 rounded-3xl object-cover mx-auto border-4 border-lime-400 shadow-2xl"
               />
               <div>
@@ -389,7 +391,7 @@ export const AdminProfileSettings: React.FC<AdminProfileSettingsProps> = ({
                           : 'border-emerald-800 hover:border-emerald-600'
                       }`}
                     >
-                      <img src={url} alt={`Preset ${idx + 1}`} className="w-full h-16 object-cover" />
+                      <img src={url} alt={`Preset ${idx + 1}`} referrerPolicy="no-referrer" className="w-full h-16 object-cover" />
                       {selectedAvatar === url && (
                         <div className="absolute inset-0 bg-lime-400/30 flex items-center justify-center">
                           <CheckCircle2 className="w-5 h-5 text-emerald-950 font-bold" />
