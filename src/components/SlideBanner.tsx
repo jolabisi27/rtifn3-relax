@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink, Shield, Phone, Sparkles, Image as ImageIcon } from 'lucide-react';
 
+import posterImg from '../assets/images/rtifn_tinubu_poster_1786275711892.jpg';
+import bannerImg from '../assets/images/call_centre_banner_1786275728501.jpg';
+import rallyImg from '../assets/images/rtifn_rally_1786274866514.jpg';
+import repImg from '../assets/images/call_centre_rep_1786274881061.jpg';
+import logoImg from '../assets/images/rtifn_logo_1786274851065.jpg';
+
 interface SlideBannerProps {
   onRegisterClick?: () => void;
   onCallCentreClick?: () => void;
@@ -25,7 +31,7 @@ const BANNER_SLIDES: BannerSlide[] = [
     id: 'tinubu_national_exercise',
     title: 'National Registration Exercise 2026',
     subtitle: 'Relax Tinubu Is Fixing Nigeria (RTIFN)',
-    imageSrc: '/assets/images/rtifn_tinubu_poster_1786275711892.jpg',
+    imageSrc: posterImg,
     badge: '1st June 2026 — 30th June 2026',
     description: 'Be part of the movement! Register your support and build a better Nigeria together. Powered by the National Directorate Contact and Mobilization.',
     ctaText: 'Register Support Now',
@@ -36,7 +42,7 @@ const BANNER_SLIDES: BannerSlide[] = [
     id: 'call_centre_poster',
     title: 'RTIFN Dedicated Call Centre',
     subtitle: 'Here to Serve. Here to Support. Here for You.',
-    imageSrc: '/assets/images/call_centre_banner_1786275728501.jpg',
+    imageSrc: bannerImg,
     badge: 'We Are Just a Call Away',
     description: 'Need assistance with PVC Registration, Ward support, or INEC office locations? Contact our dedicated support team today.',
     ctaText: 'Call 09138886874',
@@ -47,7 +53,7 @@ const BANNER_SLIDES: BannerSlide[] = [
     id: 'grassroots_rally',
     title: 'Grand Grassroots Mobilization',
     subtitle: 'Uniting Citizens Across All 36 States & FCT',
-    imageSrc: '/assets/images/rtifn_rally_1786274866514.jpg',
+    imageSrc: rallyImg,
     badge: '6 Geopolitical Zones',
     description: 'Empowering local polling unit agents, ward mobilizers, and youth leaders across 774 Local Government Areas.',
     ctaText: 'View Campaign Presentation',
@@ -57,7 +63,7 @@ const BANNER_SLIDES: BannerSlide[] = [
     id: 'call_centre_officer',
     title: 'Interactive Citizen Helpdesk & Support',
     subtitle: 'Reliable Service & Friendly Support',
-    imageSrc: '/assets/images/call_centre_rep_1786274881061.jpg',
+    imageSrc: repImg,
     badge: '24/7 Service Available',
     description: 'Guiding voters on PVC verification, Ward & LGA registration, and feedback channels nationwide.',
     ctaText: 'Open Call Centre Desk',
@@ -68,7 +74,7 @@ const BANNER_SLIDES: BannerSlide[] = [
     id: 'official_emblem',
     title: 'Official RTIFN Emblem & Seal',
     subtitle: 'Progress, Prosperity & National Transformation',
-    imageSrc: '/assets/images/rtifn_logo_1786274851065.jpg',
+    imageSrc: logoImg,
     badge: 'Official Movement Emblem',
     description: 'Symbolizing continuous national development, industrial growth, and democratic unity under President Bola Ahmed Tinubu.',
     ctaText: 'Join the Movement',

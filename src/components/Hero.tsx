@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, ArrowRight, Presentation, Phone, Users, Calendar, Award, CheckCircle } from 'lucide-react';
+import rallyImg from '../assets/images/rtifn_rally_1786274866514.jpg';
 
 interface HeroProps {
   onRegisterClick: () => void;
@@ -173,12 +174,12 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick, onSlidesClick, regi
             {/* Campaign Visual Thumbnail */}
             <div className="relative rounded-2xl overflow-hidden border border-emerald-700/80 shadow-xl group">
               <img
-                src="/assets/images/rtifn_rally_1786274866514.jpg"
+                src={rallyImg}
                 alt="RTIFN Campaign Rally"
                 referrerPolicy="no-referrer"
                 className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
+                  (e.target as HTMLImageElement).src = '/assets/images/rtifn_rally_1786274866514.jpg';
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/40 to-transparent flex items-end p-4">

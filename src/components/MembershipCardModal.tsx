@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Voter } from '../types';
+import logoImg from '../assets/images/rtifn_logo_1786274851065.jpg';
 import { CheckCircle2, Download, Printer, Share2, X, Shield, UserPlus, Home } from 'lucide-react';
 
 interface MembershipCardModalProps {
@@ -78,11 +79,11 @@ export const MembershipCardModal: React.FC<MembershipCardModalProps> = ({
             <div className="flex items-center justify-between border-b border-lime-400/30 pb-3">
               <div className="flex items-center gap-2.5">
                 <img
-                  src="/assets/images/rtifn_logo_1786274851065.jpg"
+                  src={logoImg}
                   alt="RTIFN Emblem"
                   referrerPolicy="no-referrer"
                   className="w-10 h-10 rounded-full border border-lime-400 object-cover"
-                  onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                  onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/rtifn_logo_1786274851065.jpg'; }}
                 />
                 <div>
                   <h4 className="text-xs font-black text-lime-300 tracking-wider uppercase leading-none">

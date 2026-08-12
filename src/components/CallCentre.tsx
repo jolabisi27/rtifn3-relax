@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SupportInquiry } from '../types';
+import repImg from '../assets/images/call_centre_rep_1786274881061.jpg';
 import {
   Phone, Headset, MapPin, HelpCircle, MessageSquare, Handshake, CheckCircle2,
   Send, Sparkles, Clock, ShieldCheck, Check
@@ -107,11 +108,11 @@ export const CallCentre: React.FC = () => {
           <div className="lg:col-span-5 space-y-6">
             <div className="relative rounded-3xl overflow-hidden border-2 border-lime-400/80 shadow-2xl group">
               <img
-                src="/assets/images/call_centre_rep_1786274881061.jpg"
+                src={repImg}
                 alt="RTIFN Call Centre Support"
                 referrerPolicy="no-referrer"
                 className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
-                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/call_centre_rep_1786274881061.jpg'; }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/40 to-transparent flex flex-col justify-end p-6 space-y-1">
                 <span className="text-xs font-bold text-lime-300 uppercase tracking-widest">
