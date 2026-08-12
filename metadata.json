@@ -1,0 +1,6 @@
+{
+  "name": "Relax Tinubu is Fixing Nigeria-RTIFN",
+  "description": "The Relax Voters Registration App and campaign platform for RTIFN - voter registration, mobilization, core focus areas, Call Centre, and presentation slides.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
