@@ -179,7 +179,9 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick, onSlidesClick, regi
                 referrerPolicy="no-referrer"
                 className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/assets/images/rtifn_rally_1786274866514.jpg';
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = '/assets/images/rtifn_rally_1786274866514.jpg';
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/40 to-transparent flex items-end p-4">

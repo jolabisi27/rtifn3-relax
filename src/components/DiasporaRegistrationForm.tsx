@@ -8,9 +8,16 @@ import { Globe, CheckCircle2, Sparkles, Info, CreditCard, Building2, UserCheck, 
 interface DiasporaRegistrationFormProps {
   onVoterRegistered: (voter: Voter) => void;
   onGoHome?: () => void;
+  allVoters?: Voter[];
+  onSelectVoter?: (voter: Voter) => void;
 }
 
-export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> = ({ onVoterRegistered, onGoHome }) => {
+export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> = ({
+  onVoterRegistered,
+  onGoHome,
+  allVoters = [],
+  onSelectVoter
+}) => {
   // Basic personal details
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -49,6 +56,8 @@ export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> =
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [recentVoter, setRecentVoter] = useState<Voter | null>(null);
+  const [sessionSubmissions, setSessionSubmissions] = useState<Voter[]>([]);
+  const [showSessionHistory, setShowSessionHistory] = useState(true);
 
   // Handle zone change -> auto select first state, first LGA, first Ward, and first Polling Unit
   const handleZoneChange = (newZone: GeopoliticalZone) => {
@@ -179,6 +188,7 @@ export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> =
 
       setIsSubmitting(false);
       setRecentVoter(newVoter);
+      setSessionSubmissions((prev) => [newVoter, ...prev]);
       onVoterRegistered(newVoter);
 
       // Reset form
@@ -201,23 +211,6 @@ export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> =
   };
 
   const handleResetAndAddNewMember = () => {
-    setRecentVoter(null);
-    setFullName('');
-    setEmail('');
-    setPhone('');
-    setAge('');
-    setForeignAddress('');
-    setApcRegistrationNumber('');
-    setAccountName('');
-    setAccountNumber('');
-    setBankName('');
-    setSupportGroupName('');
-    setLikeAboutTinubuAdmin('');
-    setTinubuImproveArea('');
-    setWhyJoinRtifn('');
-    setWard('');
-    setVin('');
-
     const el = document.getElementById('diaspora-registration');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -268,7 +261,10 @@ export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> =
                 Official registration for Relax Tinubu Is Fixing Nigeria (RTIFN)
               </p>
             </div>
-            <div className="shrink-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-extrabold uppercase px-3 py-1.5 bg-emerald-900 border border-emerald-700 text-lime-300 rounded-lg tracking-wider block shadow">
+                Total DB: {allVoters.length} Supporters
+              </span>
               <span className="text-[10px] font-extrabold uppercase px-3 py-1.5 bg-lime-400 text-emerald-950 rounded-lg tracking-widest block shadow">
                 RTIFN DIASPORA NETWORK
               </span>
@@ -277,19 +273,92 @@ export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> =
 
           {/* Success Banner */}
           {recentVoter && (
-            <div className="mb-8 p-5 bg-gradient-to-br from-emerald-900 to-emerald-950 border-2 border-lime-400 rounded-2xl shadow-xl space-y-4">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-6 h-6 text-lime-400 shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="text-base font-black text-lime-300">
-                    Diaspora Registration Submitted Successfully!
-                  </h4>
-                  <p className="text-xs text-emerald-100 mt-1">
-                    Member <strong className="text-white capitalize">{recentVoter.fullName}</strong> ({recentVoter.countryOfResidence}) has been saved.
-                    Code: <span className="font-mono font-bold text-lime-300">{recentVoter.registrationCode}</span>
-                  </p>
+            <div className="mb-8 p-5 sm:p-6 bg-gradient-to-br from-emerald-900 to-emerald-950 border-2 border-lime-400 rounded-2xl shadow-xl space-y-4 animate-in fade-in">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-lime-400 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-base font-black text-lime-300">
+                      Diaspora Registration Saved & Appended Successfully!
+                    </h4>
+                    <p className="text-xs text-emerald-100 mt-1">
+                      Member <strong className="text-white capitalize">{recentVoter.fullName}</strong> ({recentVoter.countryOfResidence}) has been saved.
+                      Code: <span className="font-mono font-bold text-lime-300">{recentVoter.registrationCode}</span>
+                    </p>
+                    <p className="text-[11px] text-lime-200/90 mt-1">
+                      ✅ All previous records remain preserved in the central database ({allVoters.length} total supporters registered).
+                    </p>
+                  </div>
                 </div>
+
+                {onSelectVoter && (
+                  <button
+                    type="button"
+                    onClick={() => onSelectVoter(recentVoter)}
+                    className="shrink-0 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-black text-xs py-2 px-3 rounded-xl shadow flex items-center gap-1.5 cursor-pointer transition-all"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>View Membership Card</span>
+                  </button>
+                )}
               </div>
+
+              {/* Session History Drawer */}
+              {sessionSubmissions.length > 0 && (
+                <div className="pt-3 border-t border-emerald-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-lime-300 flex items-center gap-1.5">
+                      <UserCheck className="w-4 h-4 text-lime-400" />
+                      Diaspora Members Registered in this Session ({sessionSubmissions.length})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowSessionHistory(!showSessionHistory)}
+                      className="text-[11px] text-emerald-300 hover:text-white underline cursor-pointer"
+                    >
+                      {showSessionHistory ? 'Hide List' : 'Show List'}
+                    </button>
+                  </div>
+
+                  {showSessionHistory && (
+                    <div className="bg-emerald-950/80 border border-emerald-800 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2">
+                      {sessionSubmissions.map((voter, idx) => (
+                        <div
+                          key={voter.id || idx}
+                          className="flex items-center justify-between gap-2 p-2 bg-emerald-900/60 hover:bg-emerald-900 border border-emerald-800 rounded-lg text-xs transition-colors"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="w-5 h-5 rounded-full bg-lime-400 text-emerald-950 font-black text-[10px] flex items-center justify-center shrink-0">
+                              {sessionSubmissions.length - idx}
+                            </span>
+                            <div className="truncate">
+                              <span className="font-bold text-white block truncate">{voter.fullName}</span>
+                              <span className="text-[10px] text-emerald-300 font-mono block">
+                                {voter.countryOfResidence} • {voter.phone}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-[10px] font-mono bg-emerald-950 text-lime-300 px-2 py-0.5 rounded border border-emerald-700">
+                              {voter.registrationCode}
+                            </span>
+                            {onSelectVoter && (
+                              <button
+                                type="button"
+                                onClick={() => onSelectVoter(voter)}
+                                className="text-[10px] font-bold text-lime-300 hover:underline cursor-pointer"
+                              >
+                                Card
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-emerald-800">
                 <button
@@ -298,7 +367,7 @@ export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> =
                   className="flex-1 bg-gradient-to-r from-lime-400 to-emerald-400 hover:from-lime-300 hover:to-emerald-300 text-emerald-950 font-black text-xs sm:text-sm py-3 px-4 rounded-xl shadow flex items-center justify-center gap-2 cursor-pointer transition-all border border-lime-200"
                 >
                   <UserPlus className="w-4 h-4" />
-                  <span>Add New Member</span>
+                  <span>Register Next Diaspora Member</span>
                 </button>
 
                 <button

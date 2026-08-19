@@ -26,7 +26,11 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, isAdminAuthenticat
                 alt="RTIFN Emblem"
                 referrerPolicy="no-referrer"
                 className="w-12 h-12 rounded-full border-2 border-lime-400 object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/rtifn_logo_1786274851065.jpg'; }}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = '/assets/images/rtifn_logo_1786274851065.jpg';
+                }}
               />
               <div>
                 <h3 className="text-xl font-black text-white tracking-tight">

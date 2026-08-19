@@ -207,7 +207,11 @@ const INITIAL_SUPPORT_GROUPS: SupportGroupRecord[] = [
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('rtifn_admin_session') === 'active';
+    try {
+      return typeof window !== 'undefined' && localStorage.getItem('rtifn_admin_session') === 'active';
+    } catch (e) {
+      return false;
+    }
   });
 
   const [voters, setVoters] = useState<Voter[]>(() => {
@@ -367,6 +371,8 @@ export default function App() {
             <VoterRegistrationForm
               onVoterRegistered={handleVoterRegistered}
               onGoHome={handleGoHome}
+              allVoters={voters}
+              onSelectVoter={(v) => setActiveModalVoter(v)}
             />
             <CoreFocus onRegisterClick={handleRegisterClick} />
             <SlidesDeck />
@@ -387,6 +393,8 @@ export default function App() {
             <VoterRegistrationForm
               onVoterRegistered={handleVoterRegistered}
               onGoHome={handleGoHome}
+              allVoters={voters}
+              onSelectVoter={(v) => setActiveModalVoter(v)}
             />
           </div>
         )}
@@ -396,6 +404,8 @@ export default function App() {
             <DiasporaRegistrationForm
               onVoterRegistered={handleVoterRegistered}
               onGoHome={handleGoHome}
+              allVoters={voters}
+              onSelectVoter={(v) => setActiveModalVoter(v)}
             />
           </div>
         )}
@@ -411,6 +421,7 @@ export default function App() {
             <SupportGroupRegistrationForm
               onSupportGroupRegistered={handleSupportGroupRegistered}
               onGoHome={handleGoHome}
+              allSupportGroups={supportGroups}
             />
           </div>
         )}

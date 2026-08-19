@@ -112,7 +112,11 @@ export const CallCentre: React.FC = () => {
                 alt="RTIFN Call Centre Support"
                 referrerPolicy="no-referrer"
                 className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
-                onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/call_centre_rep_1786274881061.jpg'; }}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = '/assets/images/call_centre_rep_1786274881061.jpg';
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/40 to-transparent flex flex-col justify-end p-6 space-y-1">
                 <span className="text-xs font-bold text-lime-300 uppercase tracking-widest">

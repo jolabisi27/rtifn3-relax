@@ -83,7 +83,11 @@ export const MembershipCardModal: React.FC<MembershipCardModalProps> = ({
                   alt="RTIFN Emblem"
                   referrerPolicy="no-referrer"
                   className="w-10 h-10 rounded-full border border-lime-400 object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/rtifn_logo_1786274851065.jpg'; }}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = '/assets/images/rtifn_logo_1786274851065.jpg';
+                  }}
                 />
                 <div>
                   <h4 className="text-xs font-black text-lime-300 tracking-wider uppercase leading-none">

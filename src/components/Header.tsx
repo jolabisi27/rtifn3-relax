@@ -118,7 +118,9 @@ export const Header: React.FC<HeaderProps> = ({
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/assets/images/rtifn_logo_1786274851065.jpg';
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = '/assets/images/rtifn_logo_1786274851065.jpg';
                 }}
               />
               <div className="absolute inset-0 rounded-full border border-lime-400/30 pointer-events-none"></div>

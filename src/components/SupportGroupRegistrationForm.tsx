@@ -8,11 +8,13 @@ import { Building2, CheckCircle2, Sparkles, Info, CreditCard, UserCheck, Message
 interface SupportGroupRegistrationFormProps {
   onSupportGroupRegistered?: (group: SupportGroupRecord) => void;
   onGoHome?: () => void;
+  allSupportGroups?: SupportGroupRecord[];
 }
 
 export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationFormProps> = ({
   onSupportGroupRegistered,
-  onGoHome
+  onGoHome,
+  allSupportGroups = []
 }) => {
   // 1. Group Information
   const [groupName, setGroupName] = useState('');
@@ -52,6 +54,8 @@ export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationForm
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [recentGroup, setRecentGroup] = useState<SupportGroupRecord | null>(null);
+  const [sessionSubmissions, setSessionSubmissions] = useState<SupportGroupRecord[]>([]);
+  const [showSessionHistory, setShowSessionHistory] = useState(true);
 
   const handleZoneChange = (newZone: GeopoliticalZone) => {
     setZone(newZone);
@@ -178,6 +182,7 @@ export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationForm
 
       setIsSubmitting(false);
       setRecentGroup(newGroup);
+      setSessionSubmissions((prev) => [newGroup, ...prev]);
       if (onSupportGroupRegistered) {
         onSupportGroupRegistered(newGroup);
       }
@@ -200,21 +205,6 @@ export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationForm
   };
 
   const handleResetAndAddNewGroup = () => {
-    setRecentGroup(null);
-    setGroupName('');
-    setAcronym('');
-    setCacNumber('');
-    setConvenerName('');
-    setEmail('');
-    setPhone('');
-    setOfficeAddress('');
-    setAccountName('');
-    setAccountNumber('');
-    setBankName('');
-    setLikeAboutTinubuAdmin('');
-    setTinubuImproveArea('');
-    setWhyAlignWithRtifn('');
-
     const el = document.getElementById('support-group-registration');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -265,7 +255,10 @@ export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationForm
                 Official registration for Relax Tinubu Is Fixing Nigeria (RTIFN) Support Groups
               </p>
             </div>
-            <div className="shrink-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-extrabold uppercase px-3 py-1.5 bg-emerald-900 border border-emerald-700 text-lime-300 rounded-lg tracking-wider block shadow">
+                Total DB: {allSupportGroups.length} Groups
+              </span>
               <span className="text-[10px] font-extrabold uppercase px-3 py-1.5 bg-lime-400 text-emerald-950 rounded-lg tracking-widest block shadow">
                 RTIFN COALITION DIRECTORATE
               </span>
@@ -274,19 +267,68 @@ export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationForm
 
           {/* Success Banner */}
           {recentGroup && (
-            <div className="mb-8 p-5 bg-gradient-to-br from-emerald-900 to-emerald-950 border-2 border-lime-400 rounded-2xl shadow-xl space-y-4">
+            <div className="mb-8 p-5 sm:p-6 bg-gradient-to-br from-emerald-900 to-emerald-950 border-2 border-lime-400 rounded-2xl shadow-xl space-y-4 animate-in fade-in">
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="w-6 h-6 text-lime-400 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-base font-black text-lime-300">
-                    Support Group Registered Successfully!
+                    Support Group Registered & Appended Successfully!
                   </h4>
                   <p className="text-xs text-emerald-100 mt-1">
                     Group <strong className="text-white capitalize">{recentGroup.groupName}</strong> ({recentGroup.acronym || 'RTIFN Affiliate'}) has been onboarded.
                     Registration Code: <span className="font-mono font-bold text-lime-300">{recentGroup.registrationCode}</span>
                   </p>
+                  <p className="text-[11px] text-lime-200/90 mt-1">
+                    ✅ All previous support groups remain safely stored in the central coalition database ({allSupportGroups.length} total groups registered).
+                  </p>
                 </div>
               </div>
+
+              {/* Session History Drawer */}
+              {sessionSubmissions.length > 0 && (
+                <div className="pt-3 border-t border-emerald-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-lime-300 flex items-center gap-1.5">
+                      <UserCheck className="w-4 h-4 text-lime-400" />
+                      Support Groups Registered in this Session ({sessionSubmissions.length})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowSessionHistory(!showSessionHistory)}
+                      className="text-[11px] text-emerald-300 hover:text-white underline cursor-pointer"
+                    >
+                      {showSessionHistory ? 'Hide List' : 'Show List'}
+                    </button>
+                  </div>
+
+                  {showSessionHistory && (
+                    <div className="bg-emerald-950/80 border border-emerald-800 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2">
+                      {sessionSubmissions.map((group, idx) => (
+                        <div
+                          key={group.id || idx}
+                          className="flex items-center justify-between gap-2 p-2 bg-emerald-900/60 hover:bg-emerald-900 border border-emerald-800 rounded-lg text-xs transition-colors"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="w-5 h-5 rounded-full bg-lime-400 text-emerald-950 font-black text-[10px] flex items-center justify-center shrink-0">
+                              {sessionSubmissions.length - idx}
+                            </span>
+                            <div className="truncate">
+                              <span className="font-bold text-white block truncate">{group.groupName}</span>
+                              <span className="text-[10px] text-emerald-300 font-mono block">
+                                {group.state} • {group.convenerName} ({group.phone})
+                              </span>
+                            </div>
+                          </div>
+
+                          <span className="text-[10px] font-mono bg-emerald-950 text-lime-300 px-2 py-0.5 rounded border border-emerald-700 shrink-0">
+                            {group.registrationCode}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-emerald-800">
                 <button

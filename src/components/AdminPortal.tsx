@@ -46,7 +46,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     if (typeof parentIsAuthenticated === 'boolean') return parentIsAuthenticated;
-    return localStorage.getItem('rtifn_admin_session') === 'active';
+    try {
+      return typeof window !== 'undefined' && localStorage.getItem('rtifn_admin_session') === 'active';
+    } catch (e) {
+      return false;
+    }
   });
 
   useEffect(() => {
@@ -61,9 +65,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   // Admin Profile Credentials State
   const [adminProfile, setAdminProfile] = useState<AdminProfileData>(() => {
-    const saved = localStorage.getItem('rtifn_admin_profile');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) { /* fallback */ }
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('rtifn_admin_profile') : null;
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      // Fallback to default Dr. Olabode super admin
     }
     return {
       fullName: 'Dr. Olabisi Olabode',
@@ -98,7 +106,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   const resolveAdminProfile = (inputUsername: string): AdminProfileData => {
     const query = inputUsername.trim().toLowerCase();
-    if (!query) {
+    
+    // Check if input refers to Dr. Olabisi Olabode (Super Admin)
+    const isDrOlabode =
+      !query ||
+      query === 'drolabode_admin' ||
+      query === 'dr_olabode' ||
+      query === 'olabisiolabode@gmail.com' ||
+      query === 'admin.olabode@rtifn.org' ||
+      query.includes('olabode') ||
+      query.includes('olabisi');
+
+    if (isDrOlabode) {
       return {
         fullName: 'Dr. Olabisi Olabode',
         username: 'drolabode_admin',
@@ -140,12 +159,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         email: matched.email || (query.includes('@') ? query : `${query}@rtifn.org`),
         phone: matched.phone || '08039988776',
         avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
-        roleName: matched.roleName || 'Administrator',
+        roleName: matched.roleName || 'Zonal Operations Coordinator',
         assignedZone: matched.assignedZone || 'National HQ - Abuja'
       };
     }
 
-    // If no matching existing admin found, construct dynamic profile for this username (e.g. kunlex)
+    // If no matching existing admin found, assign Campaign Operations Officer (NON-super admin role)
     const cleanUser = query.includes('@') ? query.split('@')[0] : query;
     const formattedName = cleanUser
       .replace(/[_.-]/g, ' ')
@@ -159,20 +178,20 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       email: query.includes('@') ? query : `${cleanUser}@rtifn.org`,
       phone: '08012345678',
       avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
-      roleName: 'Super Administrator',
-      assignedZone: 'National HQ - Abuja'
+      roleName: 'Zonal Operations Coordinator',
+      assignedZone: 'Regional Operations Zone'
     };
 
-    // Add this new user into the admin personnel directory in localStorage
+    // Add this new user into the admin personnel directory in localStorage with standard staff role
     const newUserRecord = {
       id: `usr_${Date.now()}`,
       fullName: formattedName,
       username: cleanUser,
       email: newProfile.email,
       phone: newProfile.phone,
-      roleId: 'role_super_admin',
-      roleName: 'Super Administrator',
-      assignedZone: 'National HQ',
+      roleId: 'role_zonal_coord',
+      roleName: 'Zonal Operations Coordinator',
+      assignedZone: 'Regional Operations Zone',
       status: 'Active',
       lastLogin: 'Just now',
       createdAt: new Date().toISOString().split('T')[0]
@@ -212,9 +231,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     setAuthError('');
   };
 
-  const handleQuickLogin = () => {
-    const input = usernameInput.trim() || 'kunlex';
-    const profile = resolveAdminProfile(input);
+  const handleQuickLoginAs = (username: string) => {
+    setUsernameInput(username);
+    setPasswordInput('RTIFN2027#Pass');
+    const profile = resolveAdminProfile(username);
     setAdminProfile(profile);
     localStorage.setItem('rtifn_admin_profile', JSON.stringify(profile));
 
@@ -338,20 +358,79 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </button>
             </form>
 
-            <div className="pt-4 border-t border-emerald-800/80 text-center space-y-2">
-              <button
-                onClick={handleQuickLogin}
-                className="text-xs text-lime-300 font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"
-              >
-                <UserCheck className="w-3.5 h-3.5" />
-                <span>Quick One-Click Demo Sign In</span>
-              </button>
+            <div className="pt-4 border-t border-emerald-800/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider">
+                  Test Sign-In As:
+                </span>
+                <span className="text-[10px] text-emerald-400">Click to test RBAC roles</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleQuickLoginAs('drolabode_admin')}
+                  className="bg-lime-400/20 hover:bg-lime-400 hover:text-emerald-950 text-lime-300 border border-lime-400/40 p-2.5 rounded-xl text-left transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-1.5 font-black text-xs">
+                    <span>👑 Dr. Olabode</span>
+                  </div>
+                  <span className="text-[10px] text-emerald-300 block group-hover:text-emerald-900 font-semibold">
+                    Super Administrator
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLoginAs('nkechi_okoro')}
+                  className="bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 hover:text-white border border-emerald-700 p-2.5 rounded-xl text-left transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-xs">
+                    <span>🗺️ Chief Okoro</span>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 block">
+                    Zonal Coordinator (SE)
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLoginAs('funmi_adeyemi')}
+                  className="bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 hover:text-white border border-emerald-700 p-2.5 rounded-xl text-left transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-xs">
+                    <span>🌍 Amb. Funmi</span>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 block">
+                    Diaspora Officer
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickLoginAs('u_garba')}
+                  className="bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 hover:text-white border border-emerald-700 p-2.5 rounded-xl text-left transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-1.5 font-bold text-xs">
+                    <span>🛡️ Alhaji Garba</span>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 block">
+                    Mobilization Director
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </section>
     );
   }
+
+  const isCurrentSuperAdmin = Boolean(
+    adminProfile.roleName?.toLowerCase().includes('super administrator') ||
+    adminProfile.username === 'drolabode_admin' ||
+    adminProfile.email === 'olabisiolabode@gmail.com'
+  );
 
   // Authenticated Admin Dashboard View
   return (
@@ -365,9 +444,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <span className="px-3 py-1 bg-lime-400 text-emerald-950 text-[10px] font-black uppercase tracking-wider rounded-full shadow">
                 AUTHENTICATED ADMIN PORTAL
               </span>
-              <span className="px-2.5 py-1 bg-emerald-800 text-lime-300 text-[10px] font-bold rounded-full border border-emerald-700">
-                Super Admin Access
-              </span>
+              {isCurrentSuperAdmin ? (
+                <span className="px-2.5 py-1 bg-lime-400 text-emerald-950 text-[10px] font-black rounded-full shadow flex items-center gap-1">
+                  👑 Super Administrator
+                </span>
+              ) : (
+                <span className="px-2.5 py-1 bg-emerald-800 text-lime-300 text-[10px] font-bold rounded-full border border-emerald-700 flex items-center gap-1">
+                  👤 {adminProfile.roleName}
+                </span>
+              )}
             </div>
 
             <h2 className="text-3xl sm:text-4xl font-black text-white flex items-center gap-3">
@@ -549,7 +634,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         )}
 
         {activeAdminTab === 'roles' && (
-          <AdminRolesManagement />
+          <AdminRolesManagement currentUser={adminProfile} />
         )}
 
         {activeAdminTab === 'profile' && (

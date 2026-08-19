@@ -6,6 +6,7 @@ import {
   AdminPrivilegeCategory,
   AdminScopeLevel
 } from '../types';
+import { AdminProfileData } from './AdminProfileSettings';
 import {
   ShieldCheck,
   UserCheck,
@@ -232,46 +233,76 @@ interface AdminRolesManagementProps {
   onSaveRole?: (role: AdminRole) => void;
   users?: AdminUser[];
   onAddUser?: (user: AdminUser) => void;
+  currentUser?: AdminProfileData;
 }
 
 export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
-  onAddUser
+  onAddUser,
+  currentUser
 }) => {
   // Initialize Roles from localStorage if available
   const [rolesList, setRolesList] = useState<AdminRole[]>(() => {
-    const saved = localStorage.getItem('rtifn_admin_roles');
-    if (saved) {
-      try {
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('rtifn_admin_roles') : null;
+      if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {
-        console.error('Error parsing stored admin roles', e);
       }
+    } catch (e) {
+      console.error('Error parsing stored admin roles', e);
     }
     return INITIAL_ROLES;
   });
 
   // Initialize Admin Users from localStorage if available
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>(() => {
-    const saved = localStorage.getItem('rtifn_admin_users');
-    if (saved) {
-      try {
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('rtifn_admin_users') : null;
+      if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {
-        console.error('Error parsing stored admin users', e);
       }
+    } catch (e) {
+      console.error('Error parsing stored admin users', e);
     }
     return INITIAL_ADMIN_USERS;
   });
 
+  // Determine if the current authenticated user has Super Administrator authority
+  const isSuperAdmin = Boolean(
+    currentUser?.roleName?.toLowerCase().includes('super administrator') ||
+    currentUser?.roleName === 'Super Administrator' ||
+    currentUser?.username === 'drolabode_admin' ||
+    currentUser?.username === 'dr_olabode' ||
+    currentUser?.email === 'olabisiolabode@gmail.com' ||
+    currentUser?.email === 'admin.olabode@rtifn.org' ||
+    adminUsers.some(
+      (u) =>
+        ((u.username && currentUser?.username && u.username.toLowerCase() === currentUser.username.toLowerCase()) ||
+         (u.email && currentUser?.email && u.email.toLowerCase() === currentUser.email.toLowerCase())) &&
+        (u.roleId === 'role_super_admin' || u.roleName === 'Super Administrator')
+    )
+  );
+
   // Sync state changes with localStorage
   useEffect(() => {
-    localStorage.setItem('rtifn_admin_roles', JSON.stringify(rolesList));
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('rtifn_admin_roles', JSON.stringify(rolesList));
+      }
+    } catch (e) {
+      // Storage limit or blocked
+    }
   }, [rolesList]);
 
   useEffect(() => {
-    localStorage.setItem('rtifn_admin_users', JSON.stringify(adminUsers));
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('rtifn_admin_users', JSON.stringify(adminUsers));
+      }
+    } catch (e) {
+      // Storage limit or blocked
+    }
   }, [adminUsers]);
 
   const [activeTab, setActiveTab] = useState<'roles' | 'users' | 'matrix'>('roles');
@@ -332,6 +363,10 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
   // Handle Create Role Submit
   const handleCreateRoleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSuperAdmin) {
+      alert('Access Denied: Only Super Administrators can create new administrative roles.');
+      return;
+    }
     if (!newRoleName.trim()) {
       alert('Please enter a Role Name.');
       return;
@@ -367,6 +402,10 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
   // Handle Create User Submit
   const handleCreateUserSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSuperAdmin) {
+      alert('Access Denied: Only Super Administrators can create or register new admin accounts.');
+      return;
+    }
     if (!newUserName.trim() || !newUserEmail.trim() || !newUserPhone.trim()) {
       alert('Please fill in all required user contact details.');
       return;
@@ -409,6 +448,10 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
 
   // --- EDIT ROLE HANDLERS ---
   const openEditRoleModal = (role: AdminRole) => {
+    if (!isSuperAdmin) {
+      alert('Access Denied: Only Super Administrators have authority to edit roles and configure privileges.');
+      return;
+    }
     setEditingRole(role);
     setEditRoleName(role.roleName);
     setEditRoleDescription(role.description);
@@ -426,6 +469,10 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
 
   const handleUpdateRoleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSuperAdmin) {
+      alert('Access Denied: Only Super Administrators can modify roles and privileges.');
+      return;
+    }
     if (!editingRole) return;
     if (!editRoleName.trim()) {
       alert('Please enter a Role Title.');
@@ -461,6 +508,10 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
   };
 
   const handleDeleteRole = (roleId: string, roleName: string) => {
+    if (!isSuperAdmin) {
+      alert('Access Denied: Only Super Administrators are authorized to delete roles.');
+      return;
+    }
     if (window.confirm(`Are you sure you want to delete the role "${roleName}"?`)) {
       setRolesList((prev) => prev.filter((r) => r.id !== roleId));
       alert(`Role "${roleName}" has been removed.`);
@@ -469,6 +520,10 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
 
   // --- EDIT ADMIN USER HANDLERS ---
   const openEditAdminUserModal = (usr: AdminUser) => {
+    if (!isSuperAdmin) {
+      alert('Access Denied: Only Super Administrators can edit admin accounts, modify user privileges, or reset passwords.');
+      return;
+    }
     setEditingAdminUser(usr);
     setEditUserName(usr.fullName);
     setEditUserUsername(usr.username || (usr.email.includes('@') ? usr.email.split('@')[0] : 'admin'));
@@ -506,6 +561,10 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
 
   const handleUpdateAdminUserSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSuperAdmin) {
+      alert('Access Denied: Only Super Administrators can update admin accounts, roles, or passwords.');
+      return;
+    }
     if (!editingAdminUser) return;
     if (!editUserName.trim() || !editUserEmail.trim() || !editUserPhone.trim()) {
       alert('Please fill in all required contact details.');
@@ -566,6 +625,10 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
   };
 
   const handleDeleteUser = (userId: string, userName: string) => {
+    if (!isSuperAdmin) {
+      alert('Access Denied: Only Super Administrators can delete admin accounts.');
+      return;
+    }
     if (window.confirm(`Are you sure you want to delete admin personnel "${userName}" from the directory?`)) {
       setAdminUsers((prev) => prev.filter((u) => u.id !== userId));
       alert(`Admin personnel "${userName}" removed.`);
@@ -574,6 +637,10 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
 
   // Toggle user status
   const toggleUserStatus = (userId: string) => {
+    if (!isSuperAdmin) {
+      alert('Access Denied: Only Super Administrators can suspend or activate admin accounts.');
+      return;
+    }
     setAdminUsers((prev) =>
       prev.map((u) => {
         if (u.id === userId) {
@@ -621,22 +688,66 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => setShowCreateRoleModal(true)}
-            className="bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold text-xs py-3 px-4 rounded-xl shadow-lg flex items-center gap-2 transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create New Role</span>
-          </button>
-          <button
-            onClick={() => setShowAddUserModal(true)}
-            className="bg-emerald-800 hover:bg-emerald-700 text-lime-300 font-bold text-xs py-3 px-4 rounded-xl border border-emerald-600 flex items-center gap-2 transition-all cursor-pointer"
-          >
-            <UserCheck className="w-4 h-4" />
-            <span>Assign Admin Personnel</span>
-          </button>
+          {isSuperAdmin ? (
+            <>
+              <button
+                onClick={() => setShowCreateRoleModal(true)}
+                className="bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold text-xs py-3 px-4 rounded-xl shadow-lg flex items-center gap-2 transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Create New Role</span>
+              </button>
+              <button
+                onClick={() => setShowAddUserModal(true)}
+                className="bg-emerald-800 hover:bg-emerald-700 text-lime-300 font-bold text-xs py-3 px-4 rounded-xl border border-emerald-600 flex items-center gap-2 transition-all cursor-pointer"
+              >
+                <UserCheck className="w-4 h-4" />
+                <span>Assign Admin Personnel</span>
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center gap-2 bg-emerald-900/60 border border-emerald-700 px-3.5 py-2.5 rounded-xl text-emerald-300 text-xs">
+              <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Role Creation & Personnel Management Restricted to Super Admin</span>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Security Context Banner */}
+      {!isSuperAdmin ? (
+        <div className="bg-amber-950/70 border-2 border-amber-500/80 p-4 rounded-2xl flex items-start gap-3.5 text-amber-100 shadow-xl">
+          <ShieldAlert className="w-6 h-6 text-amber-400 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-black text-xs sm:text-sm text-amber-300 uppercase tracking-wider">
+                Restricted RBAC View — Read-Only Mode
+              </span>
+              <span className="px-2 py-0.5 bg-amber-900/80 text-amber-200 rounded text-[10px] font-bold border border-amber-700">
+                Logged in: {currentUser?.fullName || 'User'} ({currentUser?.roleName || 'Officer'})
+              </span>
+            </div>
+            <p className="text-xs text-amber-200 leading-relaxed">
+              You are currently viewing roles and privileges in <strong>Read-Only Mode</strong>. Creating/editing roles, modifying privilege matrices, creating new personnel accounts, changing passwords, and deleting accounts are strictly restricted to <strong>Super Administrators</strong>.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-emerald-900/50 border border-lime-400/60 p-3.5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-emerald-100 shadow-lg">
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck className="w-5 h-5 text-lime-400 shrink-0" />
+            <div>
+              <span className="text-xs font-black text-lime-300">Super Administrator Authorization Active</span>
+              <span className="text-[11px] text-emerald-200 block">
+                Logged in as <strong>{currentUser?.fullName || 'Super Admin'}</strong> (@{currentUser?.username || 'admin'}). You have full authority to create/edit roles, assign privileges, create personnel accounts, change passwords, and manage users.
+              </span>
+            </div>
+          </div>
+          <span className="px-2.5 py-1 bg-lime-400 text-emerald-950 text-[10px] font-black uppercase rounded-lg shrink-0 shadow">
+            Super Admin Rights
+          </span>
+        </div>
+      )}
 
       {/* Sub-Navigation Tabs */}
       <div className="flex border-b border-emerald-800 gap-4 text-xs font-bold">
@@ -731,14 +842,20 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
 
                   <div className="pt-3 border-t border-emerald-800/80 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => openEditRoleModal(role)}
-                        className="px-2.5 py-1 bg-lime-400/20 hover:bg-lime-400 hover:text-emerald-950 text-lime-300 font-bold text-xs rounded-lg transition-all flex items-center gap-1 cursor-pointer border border-lime-400/40"
-                        title="Edit Role Name & Privileges"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>Edit Role</span>
-                      </button>
+                      {isSuperAdmin ? (
+                        <button
+                          onClick={() => openEditRoleModal(role)}
+                          className="px-2.5 py-1 bg-lime-400/20 hover:bg-lime-400 hover:text-emerald-950 text-lime-300 font-bold text-xs rounded-lg transition-all flex items-center gap-1 cursor-pointer border border-lime-400/40"
+                          title="Super Admin: Edit Role Name & Privileges"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>Edit Role</span>
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-emerald-400/80 bg-emerald-900/60 px-2 py-1 rounded flex items-center gap-1 border border-emerald-800 font-mono">
+                          <Lock className="w-3 h-3 text-amber-400" /> Read Only
+                        </span>
+                      )}
 
                       <button
                         onClick={() => setSelectedRoleForDetail(role)}
@@ -750,7 +867,7 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
                       </button>
                     </div>
 
-                    {!role.isSystemDefault && (
+                    {isSuperAdmin && !role.isSystemDefault && (
                       <button
                         onClick={() => handleDeleteRole(role.id, role.roleName)}
                         className="text-rose-400 hover:text-rose-300 p-1 rounded hover:bg-rose-950/60 transition-all cursor-pointer"
@@ -782,13 +899,15 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
               <Search className="w-4 h-4 text-emerald-400 absolute left-3 top-3" />
             </div>
 
-            <button
-              onClick={() => setShowAddUserModal(true)}
-              className="w-full sm:w-auto bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold text-xs py-2.5 px-4 rounded-xl shadow flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <UserCheck className="w-4 h-4" />
-              <span>Add New Admin Account</span>
-            </button>
+            {isSuperAdmin && (
+              <button
+                onClick={() => setShowAddUserModal(true)}
+                className="w-full sm:w-auto bg-lime-400 hover:bg-lime-300 text-emerald-950 font-extrabold text-xs py-2.5 px-4 rounded-xl shadow flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <UserCheck className="w-4 h-4" />
+                <span>Add New Admin Account</span>
+              </button>
+            )}
           </div>
 
           <div className="bg-emerald-950 border border-emerald-800 rounded-2xl overflow-hidden shadow-2xl">
@@ -850,33 +969,41 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
                           </td>
                           <td className="py-3.5 px-4 text-right">
                             <div className="flex items-center justify-end gap-2">
-                              <button
-                                onClick={() => openEditAdminUserModal(usr)}
-                                className="px-2.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-black rounded-lg text-[11px] flex items-center gap-1 transition-all cursor-pointer shadow"
-                                title="Super Admin: Edit Admin Role & Privileges"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" />
-                                <span>Edit Role & Privileges</span>
-                              </button>
+                              {isSuperAdmin ? (
+                                <>
+                                  <button
+                                    onClick={() => openEditAdminUserModal(usr)}
+                                    className="px-2.5 py-1.5 bg-lime-400 hover:bg-lime-300 text-emerald-950 font-black rounded-lg text-[11px] flex items-center gap-1 transition-all cursor-pointer shadow"
+                                    title="Super Admin: Edit Admin Role, Privileges & Password"
+                                  >
+                                    <Edit3 className="w-3.5 h-3.5" />
+                                    <span>Edit User & Password</span>
+                                  </button>
 
-                              <button
-                                onClick={() => toggleUserStatus(usr.id)}
-                                className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                                  usr.status === 'Active'
-                                    ? 'bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700'
-                                    : 'bg-emerald-800 hover:bg-emerald-700 text-lime-300'
-                                }`}
-                              >
-                                {usr.status === 'Active' ? 'Suspend' : 'Reactivate'}
-                              </button>
+                                  <button
+                                    onClick={() => toggleUserStatus(usr.id)}
+                                    className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                                      usr.status === 'Active'
+                                        ? 'bg-rose-900/60 hover:bg-rose-800 text-rose-200 border border-rose-700'
+                                        : 'bg-emerald-800 hover:bg-emerald-700 text-lime-300'
+                                    }`}
+                                  >
+                                    {usr.status === 'Active' ? 'Suspend' : 'Reactivate'}
+                                  </button>
 
-                              <button
-                                onClick={() => handleDeleteUser(usr.id, usr.fullName)}
-                                className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-950/60 rounded transition-all cursor-pointer"
-                                title="Delete Admin Account"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                                  <button
+                                    onClick={() => handleDeleteUser(usr.id, usr.fullName)}
+                                    className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-950/60 rounded transition-all cursor-pointer"
+                                    title="Delete Admin Account"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </>
+                              ) : (
+                                <span className="px-2.5 py-1 bg-emerald-900 text-emerald-300 rounded text-[10px] font-mono flex items-center gap-1 border border-emerald-800">
+                                  <Lock className="w-3 h-3 text-amber-400" /> Protected (Super Admin)
+                                </span>
+                              )}
                             </div>
                           </td>
                         </tr>
