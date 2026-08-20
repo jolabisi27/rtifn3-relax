@@ -111,19 +111,19 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between h-20">
           {/* Logo & Brand Name */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavClick('home')}>
-            <div className="relative w-12 h-12 rounded-full bg-emerald-900 border-2 border-lime-400/80 p-0.5 flex items-center justify-center overflow-hidden shadow-lg group">
+            <div className="relative w-13 h-13 rounded-full bg-white border-2 border-lime-400 p-0.5 flex items-center justify-center overflow-hidden shadow-lg group">
               <img
                 src={logoImg}
-                alt="RTIFN Logo"
+                alt="RTIFN Official Logo"
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform"
+                className="w-full h-full object-contain rounded-full group-hover:scale-105 transition-transform"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src = '/assets/images/rtifn_logo_1786274851065.jpg';
+                  target.src = '/assets/images/rtifn_official_logo_1787243702734.jpg';
                 }}
               />
-              <div className="absolute inset-0 rounded-full border border-lime-400/30 pointer-events-none"></div>
+              <div className="absolute inset-0 rounded-full border border-lime-400/40 pointer-events-none"></div>
             </div>
             <div>
               <div className="flex items-center gap-2">

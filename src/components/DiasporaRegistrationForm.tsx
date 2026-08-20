@@ -35,6 +35,8 @@ export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> =
   const [lga, setLga] = useState<string>('Ikeja');
   const [ward, setWard] = useState<string>(() => getWardsForLga('Ikeja')[0] || 'Ward A');
   const [pollingUnit, setPollingUnit] = useState<string>(() => getPollingUnitsForWard(getWardsForLga('Ikeja')[0] || 'Ward A')[0] || '');
+  const [isCustomWard, setIsCustomWard] = useState(false);
+  const [isCustomPollingUnit, setIsCustomPollingUnit] = useState(false);
   const [pvcStatus, setPvcStatus] = useState<PvcStatus>('Have PVC');
   const [vin, setVin] = useState('');
   const [preferredRole, setPreferredRole] = useState<PreferredRole>('Supporter');
@@ -624,39 +626,97 @@ export const DiasporaRegistrationForm: React.FC<DiasporaRegistrationFormProps> =
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-lime-300 uppercase tracking-wider mb-2">
-                    Electoral Ward List
-                  </label>
-                  <select
-                    value={ward}
-                    onChange={(e) => handleWardChange(e.target.value)}
-                    className="w-full bg-emerald-900/90 border border-emerald-700/80 focus:border-lime-400 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-lime-400/30 transition-all cursor-pointer"
-                  >
-                    {availableWards.map((w) => (
-                      <option key={w} value={w} className="bg-emerald-950 text-white">
-                        {w}
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-bold text-lime-300 uppercase tracking-wider">
+                      Electoral Ward
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsCustomWard(!isCustomWard)}
+                      className="text-[11px] text-lime-400 hover:text-lime-300 underline font-medium cursor-pointer"
+                    >
+                      {isCustomWard ? '← Choose from List' : '+ Type Custom Ward'}
+                    </button>
+                  </div>
+                  {isCustomWard ? (
+                    <input
+                      type="text"
+                      value={ward}
+                      onChange={(e) => setWard(e.target.value)}
+                      placeholder="e.g. Ward 04 (Central Area)"
+                      className="w-full bg-emerald-900/90 border border-lime-400/80 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-lime-400/40"
+                    />
+                  ) : (
+                    <select
+                      value={ward}
+                      onChange={(e) => {
+                        if (e.target.value === '__CUSTOM__') {
+                          setIsCustomWard(true);
+                          setWard('');
+                        } else {
+                          handleWardChange(e.target.value);
+                        }
+                      }}
+                      className="w-full bg-emerald-900/90 border border-emerald-700/80 focus:border-lime-400 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-lime-400/30 transition-all cursor-pointer"
+                    >
+                      {availableWards.map((w) => (
+                        <option key={w} value={w} className="bg-emerald-950 text-white">
+                          {w}
+                        </option>
+                      ))}
+                      <option value="__CUSTOM__" className="bg-emerald-950 text-lime-300 font-bold">
+                        + Other / Type Custom Ward Name...
                       </option>
-                    ))}
-                  </select>
+                    </select>
+                  )}
                 </div>
               </div>
 
               {/* Polling Unit */}
               <div>
-                <label className="block text-xs font-bold text-lime-300 uppercase tracking-wider mb-2">
-                  Polling Unit List (from Electoral Ward)
-                </label>
-                <select
-                  value={pollingUnit}
-                  onChange={(e) => setPollingUnit(e.target.value)}
-                  className="w-full bg-emerald-900/90 border border-emerald-700/80 focus:border-lime-400 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-lime-400/30 transition-all cursor-pointer"
-                >
-                  {availablePollingUnits.map((pu) => (
-                    <option key={pu} value={pu} className="bg-emerald-950 text-white">
-                      {pu}
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-bold text-lime-300 uppercase tracking-wider">
+                    Polling Unit (INEC Booth / Centre)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsCustomPollingUnit(!isCustomPollingUnit)}
+                    className="text-[11px] text-lime-400 hover:text-lime-300 underline font-medium cursor-pointer"
+                  >
+                    {isCustomPollingUnit ? '← Choose from List' : '+ Type Custom PU / Code'}
+                  </button>
+                </div>
+                {isCustomPollingUnit ? (
+                  <input
+                    type="text"
+                    value={pollingUnit}
+                    onChange={(e) => setPollingUnit(e.target.value)}
+                    placeholder="e.g. PU 004 - Community Primary School / 24-01-04-012"
+                    className="w-full bg-emerald-900/90 border border-lime-400/80 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-lime-400/40"
+                  />
+                ) : (
+                  <select
+                    value={pollingUnit}
+                    onChange={(e) => {
+                      if (e.target.value === '__CUSTOM__') {
+                        setIsCustomPollingUnit(true);
+                        setPollingUnit('');
+                      } else {
+                        setPollingUnit(e.target.value);
+                      }
+                    }}
+                    className="w-full bg-emerald-900/90 border border-emerald-700/80 focus:border-lime-400 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-lime-400/30 transition-all cursor-pointer"
+                  >
+                    {availablePollingUnits.map((pu) => (
+                      <option key={pu} value={pu} className="bg-emerald-950 text-white">
+                        {pu}
+                      </option>
+                    ))}
+                    <option value="__CUSTOM__" className="bg-emerald-950 text-lime-300 font-bold">
+                      + Other / Type Custom Polling Unit Code...
                     </option>
-                  ))}
-                </select>
+                  </select>
+                )}
               </div>
 
               {/* PVC Status & Role */}

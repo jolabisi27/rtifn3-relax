@@ -78,17 +78,19 @@ export const MembershipCardModal: React.FC<MembershipCardModalProps> = ({
             {/* Top Brand Banner */}
             <div className="flex items-center justify-between border-b border-lime-400/30 pb-3">
               <div className="flex items-center gap-2.5">
-                <img
-                  src={logoImg}
-                  alt="RTIFN Emblem"
-                  referrerPolicy="no-referrer"
-                  className="w-10 h-10 rounded-full border border-lime-400 object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null;
-                    target.src = '/assets/images/rtifn_logo_1786274851065.jpg';
-                  }}
-                />
+                <div className="w-10 h-10 rounded-full bg-white border border-lime-400 p-0.5 flex items-center justify-center overflow-hidden shrink-0">
+                  <img
+                    src={logoImg}
+                    alt="RTIFN Emblem"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-contain rounded-full"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = '/assets/images/rtifn_official_logo_1787243702734.jpg';
+                    }}
+                  />
+                </div>
                 <div>
                   <h4 className="text-xs font-black text-lime-300 tracking-wider uppercase leading-none">
                     RELAX TINUBU IS FIXING NIGERIA

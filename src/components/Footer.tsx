@@ -21,17 +21,19 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, isAdminAuthenticat
           {/* Col 1: Brand Info & Mission */}
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
-              <img
-                src={logoImg}
-                alt="RTIFN Emblem"
-                referrerPolicy="no-referrer"
-                className="w-12 h-12 rounded-full border-2 border-lime-400 object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = '/assets/images/rtifn_logo_1786274851065.jpg';
-                }}
-              />
+              <div className="w-12 h-12 rounded-full bg-white border-2 border-lime-400 p-0.5 flex items-center justify-center overflow-hidden shadow-md shrink-0">
+                <img
+                  src={logoImg}
+                  alt="RTIFN Emblem"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-contain rounded-full"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = '/assets/images/rtifn_official_logo_1787243702734.jpg';
+                  }}
+                />
+              </div>
               <div>
                 <h3 className="text-xl font-black text-white tracking-tight">
                   RTIFN: Relax Tinubu is Fixing Nigeria
