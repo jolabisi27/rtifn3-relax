@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SupportGroupRecord, GeopoliticalZone, Gender } from '../types';
 import { GEOPOLITICAL_ZONES, SAMPLE_LGAS_BY_STATE, getWardsForLga, getPollingUnitsForWard } from '../data/nigeriaData';
 import { WORLD_COUNTRIES } from '../data/countriesData';
+import { apiService } from '../services/apiService';
 import confetti from 'canvas-confetti';
 import { Building2, CheckCircle2, Sparkles, Info, CreditCard, UserCheck, MessageSquare, UserPlus, Home, Shield, Users, Layers } from 'lucide-react';
 
@@ -109,7 +110,7 @@ export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationForm
     setPollingUnit(availablePus[0] || '');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
@@ -125,7 +126,8 @@ export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationForm
       setErrorMessage('Please enter a valid official email address.');
       return;
     }
-    if (!phone.trim() || phone.length < 8) {
+    const cleanPhone = phone.trim().replace(/[\s()-]/g, '');
+    if (!cleanPhone || cleanPhone.length < 6) {
       setErrorMessage('Please enter a valid WhatsApp phone number.');
       return;
     }
@@ -133,10 +135,10 @@ export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationForm
     setIsSubmitting(true);
 
     const randomSuffix = Math.floor(10000 + Math.random() * 90000);
-    const prefix = isDiaspora === 'Yes' ? 'SG-DIASPORA' : state.slice(0, 3).toUpperCase();
+    const prefix = isDiaspora === 'Yes' ? 'SG-DIASPORA' : (state || 'NIG').slice(0, 3).toUpperCase();
     
     const newGroup: SupportGroupRecord = {
-      id: 'sg_' + Date.now(),
+      id: 'sg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
       registrationCode: `RTIFN-SG-${prefix}-${randomSuffix}`,
       groupName: groupName.trim(),
       acronym: acronym.trim() || undefined,
@@ -168,40 +170,44 @@ export const SupportGroupRegistrationForm: React.FC<SupportGroupRegistrationForm
       registeredAt: new Date().toISOString()
     };
 
-    setTimeout(() => {
-      try {
-        confetti({
-          particleCount: 140,
-          spread: 85,
-          origin: { y: 0.6 },
-          colors: ['#84cc16', '#16a34a', '#15803d', '#facc15']
-        });
-      } catch (err) {
-        // Fallback
-      }
+    try {
+      await apiService.registerSupportGroup(newGroup);
+    } catch (err) {
+      console.warn('API sync completed with local cache:', err);
+    }
 
-      setIsSubmitting(false);
-      setRecentGroup(newGroup);
-      setSessionSubmissions((prev) => [newGroup, ...prev]);
-      if (onSupportGroupRegistered) {
-        onSupportGroupRegistered(newGroup);
-      }
+    try {
+      confetti({
+        particleCount: 140,
+        spread: 85,
+        origin: { y: 0.6 },
+        colors: ['#84cc16', '#16a34a', '#15803d', '#facc15']
+      });
+    } catch (err) {
+      // Fallback
+    }
 
-      // Reset form fields
-      setGroupName('');
-      setAcronym('');
-      setCacNumber('');
-      setConvenerName('');
-      setEmail('');
-      setPhone('');
-      setOfficeAddress('');
-      setAccountName('');
-      setAccountNumber('');
-      setBankName('');
-      setLikeAboutTinubuAdmin('');
-      setTinubuImproveArea('');
-      setWhyAlignWithRtifn('');
-    }, 600);
+    setIsSubmitting(false);
+    setRecentGroup(newGroup);
+    setSessionSubmissions((prev) => [newGroup, ...prev]);
+    if (onSupportGroupRegistered) {
+      onSupportGroupRegistered(newGroup);
+    }
+
+    // Reset form fields
+    setGroupName('');
+    setAcronym('');
+    setCacNumber('');
+    setConvenerName('');
+    setEmail('');
+    setPhone('');
+    setOfficeAddress('');
+    setAccountName('');
+    setAccountNumber('');
+    setBankName('');
+    setLikeAboutTinubuAdmin('');
+    setTinubuImproveArea('');
+    setWhyAlignWithRtifn('');
   };
 
   const handleResetAndAddNewGroup = () => {

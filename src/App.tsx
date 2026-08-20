@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Voter, SupportGroupRecord } from './types';
+import { apiService } from './services/apiService';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { SlideBanner } from './components/SlideBanner';
@@ -246,6 +247,31 @@ export default function App() {
 
   const [activeModalVoter, setActiveModalVoter] = useState<Voter | null>(null);
 
+  // Sync with central server on mount
+  useEffect(() => {
+    let isMounted = true;
+    const loadCentralData = async () => {
+      try {
+        const [serverVoters, serverGroups] = await Promise.all([
+          apiService.fetchVoters(),
+          apiService.fetchSupportGroups()
+        ]);
+        if (isMounted) {
+          if (Array.isArray(serverVoters) && serverVoters.length > 0) {
+            setVoters(serverVoters);
+          }
+          if (Array.isArray(serverGroups) && serverGroups.length > 0) {
+            setSupportGroups(serverGroups);
+          }
+        }
+      } catch (err) {
+        console.warn('Initial server sync completed with local cache');
+      }
+    };
+    loadCentralData();
+    return () => { isMounted = false; };
+  }, []);
+
   // Save to localStorage when voters or support groups update
   useEffect(() => {
     try {
@@ -264,12 +290,12 @@ export default function App() {
   }, [supportGroups]);
 
   const handleVoterRegistered = (newVoter: Voter) => {
-    setVoters((prev) => [newVoter, ...prev]);
+    setVoters((prev) => [newVoter, ...prev.filter(v => v.id !== newVoter.id)]);
     setActiveModalVoter(newVoter);
   };
 
   const handleSupportGroupRegistered = (group: SupportGroupRecord) => {
-    setSupportGroups((prev) => [group, ...prev]);
+    setSupportGroups((prev) => [group, ...prev.filter(g => g.id !== group.id)]);
 
     const voterRecord: Voter = {
       id: group.id,
@@ -282,7 +308,7 @@ export default function App() {
       geopoliticalZone: group.geopoliticalZone,
       state: group.state,
       lga: group.lga,
-      ward: 'Central Office',
+      ward: group.ward || 'Central Office',
       pvcStatus: 'Have PVC',
       preferredRole: 'Mobilizer',
       hasSupportGroup: 'Yes',
@@ -296,7 +322,7 @@ export default function App() {
       registeredAt: group.registeredAt
     };
 
-    setVoters((prev) => [voterRecord, ...prev]);
+    setVoters((prev) => [voterRecord, ...prev.filter(v => v.id !== voterRecord.id)]);
     setActiveModalVoter(voterRecord);
   };
 

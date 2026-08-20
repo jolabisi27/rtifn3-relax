@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SupportInquiry } from '../types';
+import { apiService } from '../services/apiService';
 import repImg from '../assets/images/call_centre_rep_1786274881061.jpg';
 import {
   Phone, Headset, MapPin, HelpCircle, MessageSquare, Handshake, CheckCircle2,
@@ -13,11 +14,15 @@ export const CallCentre: React.FC = () => {
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone || !message) return;
 
     setSubmitted(true);
+    try {
+      await apiService.submitInquiry({ name, phone, category, message });
+    } catch (err) { }
+
     setTimeout(() => {
       setName('');
       setPhone('');

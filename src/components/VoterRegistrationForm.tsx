@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Voter, GeopoliticalZone, PvcStatus, PreferredRole, Gender, Occupation } from '../types';
 import { GEOPOLITICAL_ZONES, SAMPLE_LGAS_BY_STATE, getWardsForLga, getPollingUnitsForWard } from '../data/nigeriaData';
+import { apiService } from '../services/apiService';
 import confetti from 'canvas-confetti';
 import { Users, CheckCircle2, Sparkles, Phone, Mail, Info, CreditCard, Building2, UserCheck, HelpCircle, MessageSquare, UserPlus, Home } from 'lucide-react';
 
@@ -112,7 +113,7 @@ export const VoterRegistrationForm: React.FC<VoterRegistrationFormProps> = ({
     setPollingUnit(availablePus[0] || '');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
@@ -124,8 +125,9 @@ export const VoterRegistrationForm: React.FC<VoterRegistrationFormProps> = ({
       setErrorMessage('Please enter a valid email address.');
       return;
     }
-    if (!phone.trim() || phone.length < 10) {
-      setErrorMessage('Please enter a valid WhatsApp phone number.');
+    const cleanPhone = phone.trim().replace(/[\s()-]/g, '');
+    if (!cleanPhone || cleanPhone.length < 7) {
+      setErrorMessage('Please enter a valid phone number (minimum 7 digits).');
       return;
     }
 
@@ -133,9 +135,9 @@ export const VoterRegistrationForm: React.FC<VoterRegistrationFormProps> = ({
 
     // Create new voter object
     const randomSuffix = Math.floor(10000 + Math.random() * 90000);
-    const statePrefix = state.slice(0, 3).toUpperCase();
+    const statePrefix = (state || 'NIG').slice(0, 3).toUpperCase();
     const newVoter: Voter = {
-      id: 'voter_' + Date.now(),
+      id: 'voter_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
       registrationCode: `RTIFN-2027-${statePrefix}-${randomSuffix}`,
       fullName: fullName.trim(),
       email: email.trim().toLowerCase(),
@@ -165,40 +167,44 @@ export const VoterRegistrationForm: React.FC<VoterRegistrationFormProps> = ({
       registeredAt: new Date().toISOString()
     };
 
-    setTimeout(() => {
-      // Trigger festive confetti burst
-      try {
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { y: 0.6 },
-          colors: ['#84cc16', '#16a34a', '#15803d', '#facc15']
-        });
-      } catch (err) {
-        // Fallback
-      }
+    try {
+      await apiService.registerVoter(newVoter);
+    } catch (err) {
+      console.warn('API sync completed with local cache:', err);
+    }
 
-      setIsSubmitting(false);
-      setRecentVoter(newVoter);
-      setSessionSubmissions((prev) => [newVoter, ...prev]);
-      onVoterRegistered(newVoter);
+    // Trigger festive confetti burst
+    try {
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#84cc16', '#16a34a', '#15803d', '#facc15']
+      });
+    } catch (err) {
+      // Fallback
+    }
 
-      // Reset form fields ready for next entry
-      setFullName('');
-      setEmail('');
-      setPhone('');
-      setAge('');
-      setApcRegistrationNumber('');
-      setAccountName('');
-      setAccountNumber('');
-      setBankName('');
-      setSupportGroupName('');
-      setLikeAboutTinubuAdmin('');
-      setTinubuImproveArea('');
-      setWhyJoinRtifn('');
-      setWard('');
-      setVin('');
-    }, 600);
+    setIsSubmitting(false);
+    setRecentVoter(newVoter);
+    setSessionSubmissions((prev) => [newVoter, ...prev]);
+    onVoterRegistered(newVoter);
+
+    // Reset form fields ready for next entry
+    setFullName('');
+    setEmail('');
+    setPhone('');
+    setAge('');
+    setApcRegistrationNumber('');
+    setAccountName('');
+    setAccountNumber('');
+    setBankName('');
+    setSupportGroupName('');
+    setLikeAboutTinubuAdmin('');
+    setTinubuImproveArea('');
+    setWhyJoinRtifn('');
+    setWard('');
+    setVin('');
   };
 
   const handleResetAndAddNewMember = () => {
