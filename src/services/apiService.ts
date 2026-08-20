@@ -1,14 +1,47 @@
 import { Voter, SupportGroupRecord } from '../types';
+import { firebaseDbService } from './firebase';
 
 const API_BASE = '/api';
+
+// Helper to perform fetch with quick timeout so client is snappy
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 2500): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
 
 export const apiService = {
   // --- VOTERS / SUPPORTERS ---
   async fetchVoters(): Promise<Voter[]> {
+    // 1. Try Firebase Firestore Cloud Database first
     try {
-      const res = await fetch(`${API_BASE}/voters`, {
+      const firestoreVoters = await firebaseDbService.fetchVoters();
+      if (Array.isArray(firestoreVoters) && firestoreVoters.length > 0) {
+        try {
+          localStorage.setItem('rtifn_voters_db', JSON.stringify(firestoreVoters));
+        } catch (e) { /* ignore */ }
+        return firestoreVoters;
+      }
+    } catch (err) {
+      console.warn('Firestore fetch voters skipped:', err);
+    }
+
+    // 2. Try Node.js Express server API if running on fullstack container
+    try {
+      const res = await fetchWithTimeout(`${API_BASE}/voters`, {
         headers: { 'Accept': 'application/json' }
-      });
+      }, 2000);
+      
       if (res.ok) {
         const json = await res.json();
         if (json && Array.isArray(json.data) && json.data.length > 0) {
@@ -19,15 +52,15 @@ export const apiService = {
         }
       }
     } catch (err) {
-      console.warn('Could not fetch voters from server API, falling back to local store:', err);
+      // Quiet fallback
     }
 
-    // Fallback to local storage
+    // 3. Fallback to browser local cache
     try {
       const saved = localStorage.getItem('rtifn_voters_db');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) { /* ignore */ }
 
@@ -35,7 +68,7 @@ export const apiService = {
   },
 
   async registerVoter(voter: Voter): Promise<{ success: boolean; voter: Voter; total?: number }> {
-    // 1. Always update local storage first so user has immediate optimistic persistence
+    // 1. Instant local persistence for zero delay
     try {
       const saved = localStorage.getItem('rtifn_voters_db');
       const existing: Voter[] = saved ? JSON.parse(saved) : [];
@@ -43,26 +76,25 @@ export const apiService = {
       localStorage.setItem('rtifn_voters_db', JSON.stringify(updated));
     } catch (e) { /* ignore */ }
 
-    // 2. Post to central server
-    try {
-      const res = await fetch(`${API_BASE}/voters`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(voter)
-      });
+    // 2. Save directly to Firebase Firestore
+    const firestorePromise = firebaseDbService.saveVoter(voter).catch((err) => {
+      console.warn('Firestore background save note:', err);
+    });
 
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.voter) {
-          return { success: true, voter: json.voter, total: json.total };
-        }
-      }
-    } catch (err) {
-      console.warn('Central server sync pending; saved locally:', err);
-    }
+    // 3. Save to Express server endpoint
+    const apiPromise = fetchWithTimeout(`${API_BASE}/voters`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(voter)
+    }, 2500).catch(() => null);
+
+    await Promise.race([
+      Promise.all([firestorePromise, apiPromise]),
+      new Promise(resolve => setTimeout(resolve, 800)) // Max 800ms wait so user never hangs
+    ]);
 
     return { success: true, voter };
   },
@@ -78,19 +110,37 @@ export const apiService = {
     } catch (e) { /* ignore */ }
 
     try {
-      const res = await fetch(`${API_BASE}/voters/${id}`, { method: 'DELETE' });
-      return res.ok;
-    } catch (err) {
-      return true;
-    }
+      await firebaseDbService.deleteVoter(id);
+    } catch (e) { /* ignore */ }
+
+    try {
+      await fetchWithTimeout(`${API_BASE}/voters/${id}`, { method: 'DELETE' }, 2000);
+    } catch (err) { /* ignore */ }
+
+    return true;
   },
 
   // --- SUPPORT GROUPS ---
   async fetchSupportGroups(): Promise<SupportGroupRecord[]> {
+    // 1. Firebase Firestore first
     try {
-      const res = await fetch(`${API_BASE}/support-groups`, {
+      const firestoreGroups = await firebaseDbService.fetchSupportGroups();
+      if (Array.isArray(firestoreGroups) && firestoreGroups.length > 0) {
+        try {
+          localStorage.setItem('rtifn_support_groups_db', JSON.stringify(firestoreGroups));
+        } catch (e) { /* ignore */ }
+        return firestoreGroups;
+      }
+    } catch (err) {
+      console.warn('Firestore fetch support groups skipped:', err);
+    }
+
+    // 2. Express Server API
+    try {
+      const res = await fetchWithTimeout(`${API_BASE}/support-groups`, {
         headers: { 'Accept': 'application/json' }
-      });
+      }, 2000);
+      
       if (res.ok) {
         const json = await res.json();
         if (json && Array.isArray(json.data) && json.data.length > 0) {
@@ -100,16 +150,14 @@ export const apiService = {
           return json.data;
         }
       }
-    } catch (err) {
-      console.warn('Could not fetch support groups from server API:', err);
-    }
+    } catch (err) { /* ignore */ }
 
-    // Fallback to local storage
+    // 3. Local storage
     try {
       const saved = localStorage.getItem('rtifn_support_groups_db');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) { /* ignore */ }
 
@@ -117,7 +165,7 @@ export const apiService = {
   },
 
   async registerSupportGroup(group: SupportGroupRecord): Promise<{ success: boolean; group: SupportGroupRecord; total?: number }> {
-    // 1. Update local storage
+    // 1. Local storage
     try {
       const saved = localStorage.getItem('rtifn_support_groups_db');
       const existing: SupportGroupRecord[] = saved ? JSON.parse(saved) : [];
@@ -125,42 +173,50 @@ export const apiService = {
       localStorage.setItem('rtifn_support_groups_db', JSON.stringify(updated));
     } catch (e) { /* ignore */ }
 
-    // 2. Post to central server
-    try {
-      const res = await fetch(`${API_BASE}/support-groups`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(group)
-      });
+    // 2. Firebase Firestore
+    const firestorePromise = firebaseDbService.saveSupportGroup(group).catch(() => null);
 
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.group) {
-          return { success: true, group: json.group, total: json.total };
-        }
-      }
-    } catch (err) {
-      console.warn('Central server sync pending; saved locally:', err);
-    }
+    // 3. Express server
+    const apiPromise = fetchWithTimeout(`${API_BASE}/support-groups`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(group)
+    }, 2500).catch(() => null);
+
+    await Promise.race([
+      Promise.all([firestorePromise, apiPromise]),
+      new Promise(resolve => setTimeout(resolve, 800))
+    ]);
 
     return { success: true, group };
   },
 
   // --- INQUIRIES ---
   async submitInquiry(inquiry: { name: string; phone: string; category: string; message: string }): Promise<boolean> {
+    const id = `inq_${Date.now()}`;
+    const payload = {
+      id,
+      ...inquiry,
+      createdAt: new Date().toISOString()
+    };
+
     try {
-      const res = await fetch(`${API_BASE}/inquiries`, {
+      firebaseDbService.saveInquiry(payload).catch(() => null);
+    } catch (e) { /* ignore */ }
+
+    try {
+      await fetchWithTimeout(`${API_BASE}/inquiries`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(inquiry)
-      });
-      return res.ok;
+        body: JSON.stringify(payload)
+      }, 2500);
+      return true;
     } catch (err) {
       return true;
     }
