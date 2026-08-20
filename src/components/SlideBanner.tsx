@@ -5,7 +5,7 @@ import posterImg from '../assets/images/rtifn_tinubu_poster_1786275711892.jpg';
 import bannerImg from '../assets/images/call_centre_banner_1786275728501.jpg';
 import rallyImg from '../assets/images/rtifn_rally_1786274866514.jpg';
 import repImg from '../assets/images/call_centre_rep_1786274881061.jpg';
-import logoImg from '../assets/images/rtifn_logo_1786274851065.jpg';
+import { RTIFN_LOGO_DATA_URL } from '../assets/logoBase64';
 
 interface SlideBannerProps {
   onRegisterClick?: () => void;
@@ -74,7 +74,7 @@ const BANNER_SLIDES: BannerSlide[] = [
     id: 'official_emblem',
     title: 'Official RTIFN Emblem & Seal',
     subtitle: 'Progress, Prosperity & National Transformation',
-    imageSrc: logoImg,
+    imageSrc: RTIFN_LOGO_DATA_URL,
     badge: 'Official Movement Emblem',
     description: 'Symbolizing continuous national development, industrial growth, and democratic unity under President Bola Ahmed Tinubu.',
     ctaText: 'Join the Movement',

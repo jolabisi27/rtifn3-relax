@@ -1,6 +1,6 @@
 import React from 'react';
 import { Shield, Phone, Mail, MapPin, Globe, Award, ArrowUp } from 'lucide-react';
-import logoImg from '../assets/images/rtifn_logo_1786274851065.jpg';
+import { RTIFN_LOGO_DATA_URL } from '../assets/logoBase64';
 
 interface FooterProps {
   setActiveTab: (tab: string) => void;
@@ -23,14 +23,14 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, isAdminAuthenticat
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-white border-2 border-lime-400 p-0.5 flex items-center justify-center overflow-hidden shadow-md shrink-0">
                 <img
-                  src={logoImg}
+                  src={RTIFN_LOGO_DATA_URL}
                   alt="RTIFN Emblem"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-contain rounded-full"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
-                    target.src = '/assets/images/rtifn_official_logo_1787243702734.jpg';
+                    target.src = '/logo.png';
                   }}
                 />
               </div>

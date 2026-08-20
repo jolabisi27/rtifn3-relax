@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Users, Presentation, Shield, MapPin, Database, Menu, X, CheckCircle2, Globe, Building2, ChevronDown, UserPlus, Key, ShieldCheck, Lock, User, Camera, Settings, Heart } from 'lucide-react';
-import logoImg from '../assets/images/rtifn_logo_1786274851065.jpg';
+import { RTIFN_LOGO_DATA_URL } from '../assets/logoBase64';
 
 interface HeaderProps {
   activeTab: string;
@@ -113,14 +113,14 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavClick('home')}>
             <div className="relative w-13 h-13 rounded-full bg-white border-2 border-lime-400 p-0.5 flex items-center justify-center overflow-hidden shadow-lg group">
               <img
-                src={logoImg}
+                src={RTIFN_LOGO_DATA_URL}
                 alt="RTIFN Official Logo"
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-contain rounded-full group-hover:scale-105 transition-transform"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src = '/assets/images/rtifn_official_logo_1787243702734.jpg';
+                  target.src = '/logo.png';
                 }}
               />
               <div className="absolute inset-0 rounded-full border border-lime-400/40 pointer-events-none"></div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import officialLogoImg from '../assets/images/rtifn_official_logo_1787243702734.jpg';
+import { RTIFN_LOGO_DATA_URL } from '../assets/logoBase64';
 
 interface RtifnOfficialLogoProps {
   className?: string;
@@ -18,14 +18,14 @@ export const RtifnOfficialLogo: React.FC<RtifnOfficialLogoProps> = ({
       style={size ? { width: size, height: size } : undefined}
     >
       <img
-        src={officialLogoImg}
+        src={RTIFN_LOGO_DATA_URL}
         alt="RTIFN - Relax Tinubu Is Fixing Nigeria Official Logo"
         referrerPolicy="no-referrer"
         className="w-full h-full object-contain rounded-full"
         onError={(e) => {
           const target = e.target as HTMLImageElement;
           target.onerror = null;
-          target.src = '/assets/images/rtifn_official_logo_1787243702734.jpg';
+          target.src = '/logo.png';
         }}
       />
     </div>
