@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Phone, Users, Presentation, Shield, MapPin, Database, Menu, X, CheckCircle2, Globe, Building2, ChevronDown, UserPlus, Key, ShieldCheck, Lock, User, Camera, Settings, Heart } from 'lucide-react';
+import { Phone, Users, Shield, MapPin, Database, Menu, X, CheckCircle2, Globe, Building2, ChevronDown, UserPlus, Key, ShieldCheck, Lock, User, Camera, Settings, Heart } from 'lucide-react';
 import { RTIFN_LOGO_DATA_URL } from '../assets/logoBase64';
 
 interface HeaderProps {
@@ -55,8 +55,6 @@ export const Header: React.FC<HeaderProps> = ({
   const mainNavItems: NavItem[] = [
     { id: 'home', label: 'Home', icon: Shield },
     { id: 'donate', label: 'Donate', icon: Heart, badge: 'Paystack' },
-    { id: 'focus', label: 'Core Focus', icon: CheckCircle2 },
-    { id: 'slides', label: 'Campaign Deck', icon: Presentation, highlight: true },
     { id: 'callcentre', label: 'Call Centre', icon: Phone },
     { id: 'inec', label: 'INEC Centers', icon: MapPin },
   ];
@@ -93,7 +91,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="max-w-7xl mx-auto w-full flex flex-wrap justify-between items-center gap-2">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-lime-400 animate-pulse"></span>
-            <span>NATIONAL REGISTRATION EXERCISE: <strong className="text-lime-300">1st June 2026 — 30th June 2026</strong></span>
+            <span>NATIONAL REGISTRATION EXERCISE: <strong className="text-lime-300">1st June 2026 — 30th September 2026</strong></span>
           </div>
           <div className="flex items-center gap-4 text-xs">
             <a href="tel:09138886874" className="flex items-center gap-1 text-lime-300 hover:text-white transition-colors">

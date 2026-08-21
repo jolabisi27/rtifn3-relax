@@ -7,8 +7,6 @@ import { SlideBanner } from './components/SlideBanner';
 import { VoterRegistrationForm } from './components/VoterRegistrationForm';
 import { DiasporaRegistrationForm } from './components/DiasporaRegistrationForm';
 import { SupportGroupRegistrationForm } from './components/SupportGroupRegistrationForm';
-import { CoreFocus } from './components/CoreFocus';
-import { SlidesDeck } from './components/SlidesDeck';
 import { CallCentre } from './components/CallCentre';
 import { InecDirectory } from './components/InecDirectory';
 import { AdminDatabase } from './components/AdminDatabase';
@@ -334,14 +332,6 @@ export default function App() {
     }
   };
 
-  const handleSlidesClick = () => {
-    setActiveTab('slides');
-    const el = document.getElementById('slides');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const handleAddNewMember = () => {
     setActiveModalVoter(null);
     setActiveTab('registration');
@@ -387,11 +377,9 @@ export default function App() {
                 const el = document.getElementById('callcentre');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              onSlidesClick={handleSlidesClick}
             />
             <Hero
               onRegisterClick={handleRegisterClick}
-              onSlidesClick={handleSlidesClick}
               registeredCount={voters.length + 125480}
             />
             <VoterRegistrationForm
@@ -400,8 +388,6 @@ export default function App() {
               allVoters={voters}
               onSelectVoter={(v) => setActiveModalVoter(v)}
             />
-            <CoreFocus onRegisterClick={handleRegisterClick} />
-            <SlidesDeck />
             <CallCentre />
             <InecDirectory />
             <AdminPortal
@@ -449,18 +435,6 @@ export default function App() {
               onGoHome={handleGoHome}
               allSupportGroups={supportGroups}
             />
-          </div>
-        )}
-
-        {activeTab === 'focus' && (
-          <div className="py-8">
-            <CoreFocus onRegisterClick={handleRegisterClick} />
-          </div>
-        )}
-
-        {activeTab === 'slides' && (
-          <div className="py-8">
-            <SlidesDeck />
           </div>
         )}
 

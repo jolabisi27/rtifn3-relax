@@ -141,16 +141,6 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, isAdminAuthenticat
                 </>
               )}
               <li>
-                <button onClick={() => setActiveTab('focus')} className="hover:text-lime-300 transition-colors">
-                  Our Core Strategic Focus
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setActiveTab('slides')} className="hover:text-lime-300 transition-colors text-lime-200 font-semibold">
-                  Campaign Presentation Slides Deck
-                </button>
-              </li>
-              <li>
                 <button onClick={() => setActiveTab('callcentre')} className="hover:text-lime-300 transition-colors">
                   RTIFN Call Centre (09138886874)
                 </button>

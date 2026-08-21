@@ -231,19 +231,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     setAuthError('');
   };
 
-  const handleQuickLoginAs = (username: string) => {
-    setUsernameInput(username);
-    setPasswordInput('RTIFN2027#Pass');
-    const profile = resolveAdminProfile(username);
-    setAdminProfile(profile);
-    localStorage.setItem('rtifn_admin_profile', JSON.stringify(profile));
-
-    setIsAuthenticated(true);
-    localStorage.setItem('rtifn_admin_session', 'active');
-    if (onAuthStateChange) onAuthStateChange(true);
-    setAuthError('');
-  };
-
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('rtifn_admin_session');
@@ -357,69 +344,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 <span>Log In & Access Admin Portal</span>
               </button>
             </form>
-
-            <div className="pt-4 border-t border-emerald-800/80 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider">
-                  Test Sign-In As:
-                </span>
-                <span className="text-[10px] text-emerald-400">Click to test RBAC roles</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickLoginAs('drolabode_admin')}
-                  className="bg-lime-400/20 hover:bg-lime-400 hover:text-emerald-950 text-lime-300 border border-lime-400/40 p-2.5 rounded-xl text-left transition-all cursor-pointer group"
-                >
-                  <div className="flex items-center gap-1.5 font-black text-xs">
-                    <span>👑 Dr. Olabode</span>
-                  </div>
-                  <span className="text-[10px] text-emerald-300 block group-hover:text-emerald-900 font-semibold">
-                    Super Administrator
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickLoginAs('nkechi_okoro')}
-                  className="bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 hover:text-white border border-emerald-700 p-2.5 rounded-xl text-left transition-all cursor-pointer"
-                >
-                  <div className="flex items-center gap-1.5 font-bold text-xs">
-                    <span>🗺️ Chief Okoro</span>
-                  </div>
-                  <span className="text-[10px] text-emerald-400 block">
-                    Zonal Coordinator (SE)
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickLoginAs('funmi_adeyemi')}
-                  className="bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 hover:text-white border border-emerald-700 p-2.5 rounded-xl text-left transition-all cursor-pointer"
-                >
-                  <div className="flex items-center gap-1.5 font-bold text-xs">
-                    <span>🌍 Amb. Funmi</span>
-                  </div>
-                  <span className="text-[10px] text-emerald-400 block">
-                    Diaspora Officer
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickLoginAs('u_garba')}
-                  className="bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 hover:text-white border border-emerald-700 p-2.5 rounded-xl text-left transition-all cursor-pointer"
-                >
-                  <div className="flex items-center gap-1.5 font-bold text-xs">
-                    <span>🛡️ Alhaji Garba</span>
-                  </div>
-                  <span className="text-[10px] text-emerald-400 block">
-                    Mobilization Director
-                  </span>
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </section>

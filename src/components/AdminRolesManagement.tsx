@@ -106,7 +106,7 @@ export const INITIAL_ROLES: AdminRole[] = [
     scopeLevel: 'National',
     privilegeCodes: DEFAULT_PRIVILEGES.map((p) => p.code),
     isSystemDefault: true,
-    assignedUsersCount: 2,
+    assignedUsersCount: 1,
     createdAt: new Date().toISOString()
   },
   {
@@ -123,7 +123,7 @@ export const INITIAL_ROLES: AdminRole[] = [
       'APPROVE_SUPPORT_GROUPS'
     ],
     isSystemDefault: true,
-    assignedUsersCount: 4,
+    assignedUsersCount: 0,
     createdAt: new Date().toISOString()
   },
   {
@@ -138,7 +138,7 @@ export const INITIAL_ROLES: AdminRole[] = [
       'APPROVE_SUPPORT_GROUPS'
     ],
     isSystemDefault: true,
-    assignedUsersCount: 6,
+    assignedUsersCount: 0,
     createdAt: new Date().toISOString()
   },
   {
@@ -152,7 +152,7 @@ export const INITIAL_ROLES: AdminRole[] = [
       'EXPORT_CSV_REPORTS'
     ],
     isSystemDefault: true,
-    assignedUsersCount: 3,
+    assignedUsersCount: 0,
     createdAt: new Date().toISOString()
   },
   {
@@ -167,12 +167,12 @@ export const INITIAL_ROLES: AdminRole[] = [
       'EXPORT_CSV_REPORTS'
     ],
     isSystemDefault: true,
-    assignedUsersCount: 1,
+    assignedUsersCount: 0,
     createdAt: new Date().toISOString()
   }
 ];
 
-// Initial Admin Personnel
+// Initial Admin Personnel - Only Dr. Olabisi Olabode
 export const INITIAL_ADMIN_USERS: AdminUser[] = [
   {
     id: 'usr_1',
@@ -186,45 +186,6 @@ export const INITIAL_ADMIN_USERS: AdminUser[] = [
     status: 'Active',
     lastLogin: 'Just now',
     createdAt: '2026-05-10'
-  },
-  {
-    id: 'usr_2',
-    fullName: 'Alhaji Usman Garba',
-    username: 'u_garba',
-    email: 'u.garba@rtifn.org',
-    phone: '08023344556',
-    roleId: 'role_national_coord',
-    roleName: 'National Mobilization Director',
-    assignedZone: 'National HQ',
-    status: 'Active',
-    lastLogin: '2 hours ago',
-    createdAt: '2026-05-12'
-  },
-  {
-    id: 'usr_3',
-    fullName: 'Chief Mrs. Nkechi Okoro',
-    username: 'nkechi_okoro',
-    email: 'nkechi.okoro@rtifn.org',
-    phone: '08056677889',
-    roleId: 'role_zonal_admin',
-    roleName: 'Zonal Operations Coordinator',
-    assignedZone: 'South East',
-    status: 'Active',
-    lastLogin: 'Yesterday',
-    createdAt: '2026-05-15'
-  },
-  {
-    id: 'usr_4',
-    fullName: 'Ambassador Funmi Adeyemi',
-    username: 'funmi_adeyemi',
-    email: 'diaspora.director@rtifn.org',
-    phone: '+44 7911 123456',
-    roleId: 'role_diaspora_director',
-    roleName: 'Global Diaspora Officer',
-    assignedZone: 'Diaspora Chapters (UK/USA/Canada)',
-    status: 'Active',
-    lastLogin: '3 days ago',
-    createdAt: '2026-05-18'
   }
 ];
 
@@ -254,13 +215,20 @@ export const AdminRolesManagement: React.FC<AdminRolesManagementProps> = ({
     return INITIAL_ROLES;
   });
 
-  // Initialize Admin Users from localStorage if available
+  // Initialize Admin Users from localStorage if available (filter out deprecated test accounts)
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>(() => {
     try {
       const saved = typeof window !== 'undefined' ? localStorage.getItem('rtifn_admin_users') : null;
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const filtered = parsed.filter(
+            (u: AdminUser) =>
+              !['usr_2', 'usr_3', 'usr_4'].includes(u.id) &&
+              !['u_garba', 'nkechi_okoro', 'funmi_adeyemi'].includes(u.username?.toLowerCase() || '')
+          );
+          if (filtered.length > 0) return filtered;
+        }
       }
     } catch (e) {
       console.error('Error parsing stored admin users', e);

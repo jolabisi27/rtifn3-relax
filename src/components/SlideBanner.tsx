@@ -10,7 +10,6 @@ import { RTIFN_LOGO_DATA_URL } from '../assets/logoBase64';
 interface SlideBannerProps {
   onRegisterClick?: () => void;
   onCallCentreClick?: () => void;
-  onSlidesClick?: () => void;
 }
 
 interface BannerSlide {
@@ -21,7 +20,7 @@ interface BannerSlide {
   badge: string;
   description: string;
   ctaText?: string;
-  ctaAction?: 'register' | 'call' | 'slides';
+  ctaAction?: 'register' | 'call';
   hotline?: string;
   dates?: string;
 }
@@ -32,11 +31,11 @@ const BANNER_SLIDES: BannerSlide[] = [
     title: 'National Registration Exercise 2026',
     subtitle: 'Relax Tinubu Is Fixing Nigeria (RTIFN)',
     imageSrc: posterImg,
-    badge: '1st June 2026 — 30th June 2026',
+    badge: '1st June 2026 — 30th September 2026',
     description: 'Be part of the movement! Register your support and build a better Nigeria together. Powered by the National Directorate Contact and Mobilization.',
     ctaText: 'Register Support Now',
     ctaAction: 'register',
-    dates: '1st June 2026 TO 30th June 2026'
+    dates: '1st June 2026 TO 30th September 2026'
   },
   {
     id: 'call_centre_poster',
@@ -56,8 +55,8 @@ const BANNER_SLIDES: BannerSlide[] = [
     imageSrc: rallyImg,
     badge: '6 Geopolitical Zones',
     description: 'Empowering local polling unit agents, ward mobilizers, and youth leaders across 774 Local Government Areas.',
-    ctaText: 'View Campaign Presentation',
-    ctaAction: 'slides'
+    ctaText: 'Join Grassroots Mobilization',
+    ctaAction: 'register'
   },
   {
     id: 'call_centre_officer',
@@ -84,8 +83,7 @@ const BANNER_SLIDES: BannerSlide[] = [
 
 export const SlideBanner: React.FC<SlideBannerProps> = ({
   onRegisterClick,
-  onCallCentreClick,
-  onSlidesClick
+  onCallCentreClick
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
@@ -107,10 +105,9 @@ export const SlideBanner: React.FC<SlideBannerProps> = ({
     setCurrentIndex((prev) => (prev - 1 + BANNER_SLIDES.length) % BANNER_SLIDES.length);
   };
 
-  const handleCtaClick = (action?: 'register' | 'call' | 'slides') => {
+  const handleCtaClick = (action?: 'register' | 'call') => {
     if (action === 'register' && onRegisterClick) onRegisterClick();
     else if (action === 'call' && onCallCentreClick) onCallCentreClick();
-    else if (action === 'slides' && onSlidesClick) onSlidesClick();
   };
 
   return (

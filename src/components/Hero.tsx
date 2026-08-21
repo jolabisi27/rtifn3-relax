@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, ArrowRight, Presentation, Phone, Users, Calendar, Award, CheckCircle } from 'lucide-react';
+import { Shield, ArrowRight, Phone, Users, Calendar, Award, CheckCircle } from 'lucide-react';
 import rallyImg from '../assets/images/rtifn_rally_1786274866514.jpg';
 
 interface HeroProps {
   onRegisterClick: () => void;
-  onSlidesClick: () => void;
   registeredCount: number;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onRegisterClick, onSlidesClick, registeredCount }) => {
+export const Hero: React.FC<HeroProps> = ({ onRegisterClick, registeredCount }) => {
   // Countdown to National Registration Exercise (June 1, 2026)
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -84,13 +83,13 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick, onSlidesClick, regi
                 <ArrowRight className="w-4 h-4" />
               </button>
 
-              <button
-                onClick={onSlidesClick}
+              <a
+                href="tel:09138886874"
                 className="w-full sm:w-auto bg-emerald-900/90 hover:bg-emerald-800 text-lime-200 font-bold text-sm px-6 py-4 rounded-xl border border-lime-400/40 hover:border-lime-400 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
               >
-                <Presentation className="w-5 h-5 text-lime-300" />
-                <span>Campaign Presentation Slides</span>
-              </button>
+                <Phone className="w-4 h-4 text-lime-400" />
+                <span>Call Centre: 09138886874</span>
+              </a>
             </div>
 
             {/* Phone & Directorates affiliations */}
@@ -124,7 +123,7 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick, onSlidesClick, regi
                   NATIONAL REGISTRATION EXERCISE
                 </h3>
                 <div className="bg-lime-400 text-emerald-950 font-black text-lg py-2 px-4 rounded-xl shadow-md tracking-wider">
-                  1st JUNE 2026 — 30th JUNE 2026
+                  1st JUNE 2026 — 30th SEPTEMBER 2026
                 </div>
 
                 {/* Countdown Timer Grid */}
