@@ -71,6 +71,11 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, isAdminAuthenticat
                 </button>
               </li>
               <li>
+                <button onClick={() => { setActiveTab('rtifn-registration'); scrollToTop(); }} className="hover:text-lime-300 transition-colors font-extrabold text-lime-300 flex items-center gap-1.5">
+                  <span>✨ RTIFN Registration Page (All Portals)</span>
+                </button>
+              </li>
+              <li>
                 <button onClick={() => setActiveTab('home')} className="hover:text-lime-300 transition-colors">
                   Campaign Overview & Home
                 </button>

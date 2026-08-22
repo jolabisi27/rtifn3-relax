@@ -223,30 +223,9 @@ export const VoterRegistrationForm: React.FC<VoterRegistrationFormProps> = ({
   const availablePollingUnits = ward ? getPollingUnitsForWard(ward) : [];
 
   return (
-    <section id="registration" className="py-16 bg-gradient-to-b from-emerald-950 via-emerald-900 to-emerald-950 text-white relative">
+    <section id="registration" className="py-12 bg-gradient-to-b from-emerald-950 via-emerald-900 to-emerald-950 text-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="max-w-3xl mx-auto text-center space-y-4 mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-400/20 text-lime-300 border border-lime-400/30 text-xs font-bold uppercase tracking-wider">
-            <Users className="w-4 h-4" />
-            <span>Relax Individual Registration App</span>
-          </div>
-
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-            Individual Registration Form
-          </h2>
-
-          <div className="bg-emerald-900/80 border border-emerald-700/80 rounded-2xl p-6 text-left shadow-xl space-y-3">
-            <p className="text-sm sm:text-base text-emerald-100 leading-relaxed font-normal">
-              The <strong className="text-lime-300">Relax Individual Registration App</strong> is a strategic digital platform designed to capture and manage the records of electorates committed to supporting and actively working toward the re-election of President Bola Ahmed Tinubu in 2027.
-            </p>
-            <p className="text-xs sm:text-sm text-emerald-200 leading-relaxed">
-              Please complete all required fields below to register your support, provide feedback, and join the official campaign network.
-            </p>
-          </div>
-        </div>
-
         {/* Registration Form Card */}
         <div className="max-w-4xl mx-auto bg-emerald-950 border-2 border-lime-400/80 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
           

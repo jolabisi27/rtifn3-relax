@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Voter, SupportGroupRecord } from './types';
 import { apiService } from './services/apiService';
 import { Header } from './components/Header';
-import { Hero } from './components/Hero';
 import { SlideBanner } from './components/SlideBanner';
+import { HomepageRegistrationBanner } from './components/HomepageRegistrationBanner';
+import { HomepageCallCentreBanner } from './components/HomepageCallCentreBanner';
+import { RTIFNRegistrationPage } from './components/RTIFNRegistrationPage';
 import { VoterRegistrationForm } from './components/VoterRegistrationForm';
 import { DiasporaRegistrationForm } from './components/DiasporaRegistrationForm';
 import { SupportGroupRegistrationForm } from './components/SupportGroupRegistrationForm';
@@ -325,11 +327,13 @@ export default function App() {
   };
 
   const handleRegisterClick = () => {
-    setActiveTab('registration');
-    const el = document.getElementById('registration');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
+    setActiveTab('rtifn-registration');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenRegistrationHub = () => {
+    setActiveTab('rtifn-registration');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAddNewMember = () => {
@@ -371,33 +375,45 @@ export default function App() {
         {activeTab === 'home' && (
           <>
             <SlideBanner
-              onRegisterClick={handleRegisterClick}
+              onRegisterClick={handleOpenRegistrationHub}
               onCallCentreClick={() => {
                 setActiveTab('callcentre');
-                const el = document.getElementById('callcentre');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             />
-            <Hero
-              onRegisterClick={handleRegisterClick}
+            <HomepageRegistrationBanner
+              onOpenHub={handleOpenRegistrationHub}
+              onOpenIndividual={() => {
+                setActiveTab('registration');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onOpenDiaspora={() => {
+                setActiveTab('diaspora');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onOpenSupportGroup={() => {
+                setActiveTab('supportgroup');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               registeredCount={voters.length + 125480}
             />
-            <VoterRegistrationForm
-              onVoterRegistered={handleVoterRegistered}
-              onGoHome={handleGoHome}
-              allVoters={voters}
-              onSelectVoter={(v) => setActiveModalVoter(v)}
-            />
-            <CallCentre />
-            <InecDirectory />
-            <AdminPortal
-              voters={voters}
-              supportGroups={supportGroups}
-              onSelectVoter={(v) => setActiveModalVoter(v)}
-              isAuthenticated={isAdminAuthenticated}
-              onAuthStateChange={(authed) => setIsAdminAuthenticated(authed)}
+            <HomepageCallCentreBanner
+              onOpenCallCentre={() => {
+                setActiveTab('callcentre');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
           </>
+        )}
+
+        {activeTab === 'rtifn-registration' && (
+          <RTIFNRegistrationPage
+            onNavigate={(tab) => {
+              setActiveTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            registeredCount={voters.length + 125480}
+          />
         )}
 
         {activeTab === 'registration' && (

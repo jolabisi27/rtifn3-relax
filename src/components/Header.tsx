@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Phone, Users, Shield, MapPin, Database, Menu, X, CheckCircle2, Globe, Building2, ChevronDown, UserPlus, Key, ShieldCheck, Lock, User, Camera, Settings, Heart } from 'lucide-react';
+import { Phone, Users, Shield, MapPin, Database, Menu, X, CheckCircle2, Globe, Building2, ChevronDown, UserPlus, Key, ShieldCheck, Lock, User, Camera, Settings, Heart, Sparkles } from 'lucide-react';
 import { RTIFN_LOGO_DATA_URL } from '../assets/logoBase64';
 
 interface HeaderProps {
@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [registrationDropdownOpen, setRegistrationDropdownOpen] = useState(false);
-  const [mobileRegSubmenuOpen, setMobileRegSubmenuOpen] = useState(false);
+  const [mobileRegSubmenuOpen, setMobileRegSubmenuOpen] = useState(true);
   const [databaseDropdownOpen, setDatabaseDropdownOpen] = useState(false);
   const [mobileDbSubmenuOpen, setMobileDbSubmenuOpen] = useState(true);
 
@@ -35,6 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   const registrationSubItems: NavItem[] = [
+    { id: 'rtifn-registration', label: 'RTIFN Registration Hub', icon: Sparkles, badge: 'All Portals', highlight: true },
     { id: 'registration', label: 'Individual Registration', icon: Users, badge: 'Active' },
     { id: 'diaspora', label: 'Diaspora Registration', icon: Globe, badge: 'Global' },
     { id: 'supportgroup', label: 'Support Group Registration', icon: Building2, badge: 'Coalition' },
